@@ -17,16 +17,21 @@ export const getBudgets = query({
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
 
-    // Calculate start of current month
+    // Calculate start and end of current month
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).getTime();
 
-    // Get all transactions for this month
-    const transactionsThisMonth = await ctx.db
+    // Get all transactions for the user
+    const allTransactions = await ctx.db
       .query("transactions")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .filter((q) => q.gte("createdAt", startOfMonth))
       .collect();
+
+    // Filter to only current month transactions
+    const transactionsThisMonth = allTransactions.filter(
+      (t) => t.createdAt >= startOfMonth && t.createdAt <= endOfMonth
+    );
 
     // Calculate spent per category for current month
     const categorySpentMap = new Map<string, number>();
