@@ -43,4 +43,35 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_and_category", ["userId", "category"]),
+
+  // Prompts & AI responses table
+  prompts: defineTable({
+    userId: v.string(),
+    prompt: v.string(),
+    response: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("error")
+    ),
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+    contextData: v.optional(v.object({
+      totalSpent: v.optional(v.number()),
+      budgets: v.optional(v.array(v.object({
+        category: v.string(),
+        limit: v.number(),
+        spent: v.number(),
+      }))),
+      recentTransactions: v.optional(v.array(v.object({
+        amount: v.number(),
+        merchant: v.string(),
+        category: v.string(),
+      }))),
+    })),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_status", ["userId", "status"])
+    .index("by_created", ["createdAt"]),
 });

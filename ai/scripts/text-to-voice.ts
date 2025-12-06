@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-config({ path: '../.env.local' }); // load API keys from root
+config({ path: '.env.local' }); // load API keys
 
 import fs from 'fs';
 import path from 'path';

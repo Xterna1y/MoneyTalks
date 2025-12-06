@@ -22,13 +22,12 @@ export const getBudgets = query({
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).getTime();
 
-    // Get all transactions for the user
+    // Get all transactions for the user and filter to this month
     const allTransactions = await ctx.db
       .query("transactions")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
 
-    // Filter to only current month transactions
     const transactionsThisMonth = allTransactions.filter(
       (t) => t.createdAt >= startOfMonth && t.createdAt <= endOfMonth
     );
@@ -44,7 +43,7 @@ export const getBudgets = query({
       a.category.localeCompare(b.category)
     );
 
-    // Map to Budget type shape with dynamically calculated spent
+    // Map to Budget type shape with dynamic spent/remaining
     return sortedBudgets.map((b) => {
       const spent = categorySpentMap.get(b.category) || 0;
       const remaining = b.limit - spent;
