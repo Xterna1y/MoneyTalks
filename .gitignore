@@ -1,0 +1,16 @@
+# Node artifacts
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Output artifacts
+*.log
+voice-output.mp3
+
+# OS noise
+.DS_Store
+Thumbs.db
+
