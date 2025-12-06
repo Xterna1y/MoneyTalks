@@ -149,4 +149,3 @@ router.put("/:promptId/status", async (req, res) => {
 });
 
 export default router;
-

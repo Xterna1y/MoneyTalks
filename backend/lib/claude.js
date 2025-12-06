@@ -5,32 +5,35 @@ const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 // Use a widely available model; adjust if your account allows newer releases.
 const ANTHROPIC_MODEL = "claude-3-haiku-20240307";
 
-type FinancialContext = {
-  dashboard?: unknown;
-  budgets?: unknown;
-  history?: unknown;
-  accounts?: unknown;
-};
+/**
+ * @typedef {Object} FinancialContext
+ * @property {any} [dashboard]
+ * @property {any} [budgets]
+ * @property {any} [history]
+ * @property {any} [accounts]
+ */
 
 /**
  * Call Claude with the user prompt and injected financial context.
+ * @param {string} userPrompt
+ * @param {FinancialContext} context
+ * @returns {Promise<string>}
  */
-export async function generateClaudeResponse(
-  userPrompt: string,
-  context: FinancialContext
-): Promise<string> {
+export async function generateClaudeResponse(userPrompt, context) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error("Missing ANTHROPIC_API_KEY");
   }
 
   const systemPrompt = `
-You are MoneyTalks, a concise personal finance assistant.
+You are MoneyTalks, a concise personal finance assistant via voice response.
 Be brief (2-4 sentences). Only mention budgets/history/transactions if directly needed.
+If you do not understand the user's prompt, just say "I'm sorry, I don't understand your request.", you dont need to mention about the budgets/history/transactions.
 Avoid long lists. If data is missing, state that briefly.
+Output response such as RM12.45 as 12 ringgit 45 cents.
 `;
 
-  const contextBlock = JSON.stringify(context, null, 2);
+  const contextBlock = JSON.stringify(context || {}, null, 2);
 
   const body = {
     model: ANTHROPIC_MODEL,
@@ -70,3 +73,4 @@ Avoid long lists. If data is missing, state that briefly.
 }
 
 export default generateClaudeResponse;
+

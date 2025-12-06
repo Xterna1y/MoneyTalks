@@ -1,12 +1,14 @@
-// ElevenLabs TTS wrapper
+// ElevenLabs TTS wrapper (JS version)
 
 const ELEVEN_API_URL = "https://api.elevenlabs.io/v1/text-to-speech";
 const ELEVEN_MODEL = "eleven_turbo_v2_5";
 
 /**
  * Converts text to speech and returns a Buffer of audio/mpeg.
+ * @param {string} text
+ * @returns {Promise<Buffer>}
  */
-export async function generateSpeechBuffer(text: string): Promise<Buffer> {
+export async function generateSpeechBuffer(text) {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   const voiceId = process.env.ELEVENLABS_VOICE_ID;
 
@@ -40,3 +42,4 @@ export async function generateSpeechBuffer(text: string): Promise<Buffer> {
 }
 
 export default generateSpeechBuffer;
+

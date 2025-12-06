@@ -44,10 +44,11 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_and_category", ["userId", "category"]),
 
-  // Prompts & AI responses table
+  // Prompts table (AI prompt lifecycle)
   prompts: defineTable({
-    userId: v.string(),
+    userId: v.string(), // References users._id (string id used across app)
     prompt: v.string(),
+    contextData: v.optional(v.any()), // Optional contextual payload fetched by AI
     response: v.optional(v.string()),
     status: v.union(
       v.literal("pending"),
@@ -55,23 +56,9 @@ export default defineSchema({
       v.literal("completed"),
       v.literal("error")
     ),
-    createdAt: v.number(),
-    completedAt: v.optional(v.number()),
-    contextData: v.optional(v.object({
-      totalSpent: v.optional(v.number()),
-      budgets: v.optional(v.array(v.object({
-        category: v.string(),
-        limit: v.number(),
-        spent: v.number(),
-      }))),
-      recentTransactions: v.optional(v.array(v.object({
-        amount: v.number(),
-        merchant: v.string(),
-        category: v.string(),
-      }))),
-    })),
+    createdAt: v.number(), // Unix timestamp (ms)
+    updatedAt: v.number(), // Unix timestamp (ms)
   })
     .index("by_user", ["userId"])
-    .index("by_user_and_status", ["userId", "status"])
-    .index("by_created", ["createdAt"]),
+    .index("by_user_status", ["userId", "status"]),
 });

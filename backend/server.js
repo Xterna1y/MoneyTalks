@@ -11,6 +11,7 @@ import dashboardRoutes from "./routes/dashboard.js";
 import budgetsRoutes from "./routes/budgets.js";
 import accountsRoutes from "./routes/accounts.js";
 import promptsRoutes from "./routes/prompts.js";
+import voiceRoutes from "./routes/voice.js";
 // Backend B routes (placeholders)
 // import precheckRoutes from "./routes/precheck.js";
 // import confirmTransactionRoutes from "./routes/confirm-transaction.js";
@@ -33,6 +34,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/budgets", budgetsRoutes);
 app.use("/api/accounts", accountsRoutes);
 app.use("/api/prompts", promptsRoutes);
+app.use("/api/voice-flow", voiceRoutes);
 
 // API Routes - Backend B (TODO)
 // app.use("/api/precheck", precheckRoutes);
