@@ -3,8 +3,8 @@ import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
 
-// Load environment variables from .env.local
-config({ path: ".env.local" });
+// Load environment variables from root .env.local
+config({ path: "../.env.local" });
 
 // Import routes
 import dashboardRoutes from "./routes/dashboard.js";

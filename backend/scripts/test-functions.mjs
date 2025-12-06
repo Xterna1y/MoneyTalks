@@ -4,9 +4,9 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api.js";
 
-// Load environment variables
+// Load environment variables from root .env.local
 import { config } from "dotenv";
-config({ path: ".env.local" });
+config({ path: "../.env.local" });
 
 const client = new ConvexHttpClient(process.env.CONVEX_URL);
 
