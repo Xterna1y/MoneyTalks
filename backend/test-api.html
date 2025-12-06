@@ -10,229 +10,369 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
         .container {
             max-width: 1200px;
             margin: 0 auto;
-        }
-        
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-        
-        .test-section {
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #22c55e;
         }
-        
-        .test-section h2 {
-            color: #667eea;
+        .section h2 {
+            color: #1e293b;
             margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            font-size: 1.3rem;
         }
-        
-        .input-group {
+        .endpoint {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
             margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
         }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 600;
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
         }
-        
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
+        .method {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
         }
-        
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
+        .get { background: #dbeafe; color: #1e40af; }
+        .post { background: #dcfce7; color: #166534; }
+        .delete { background: #fee2e2; color: #991b1b; }
+        .url {
+            font-family: 'Courier New', monospace;
+            color: #475569;
+            font-size: 0.9rem;
         }
-        
         button {
-            background: #667eea;
+            background: #22c55e;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
             font-weight: 600;
-            transition: background 0.3s;
+            transition: background 0.2s;
         }
-        
         button:hover {
-            background: #5568d3;
+            background: #16a34a;
         }
-        
         button:disabled {
-            background: #ccc;
+            background: #94a3b8;
             cursor: not-allowed;
         }
-        
         .response {
             margin-top: 15px;
             padding: 15px;
-            background: #f5f5f5;
-            border-radius: 5px;
-            border-left: 4px solid #667eea;
-            max-height: 400px;
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
             overflow-y: auto;
-        }
-        
-        .response pre {
             white-space: pre-wrap;
             word-wrap: break-word;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
         }
-        
-        .status {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-weight: 600;
+        .error {
+            background: #7f1d1d;
+            color: #fecaca;
+        }
+        .success {
+            background: #14532d;
+            color: #bbf7d0;
+        }
+        .input-group {
             margin-bottom: 10px;
         }
-        
-        .status.success {
-            background: #4caf50;
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-200 { background: #dcfce7; color: #166534; }
+        .status-201 { background: #dcfce7; color: #166534; }
+        .status-400 { background: #fef3c7; color: #92400e; }
+        .status-500 { background: #fee2e2; color: #991b1b; }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .status-badge.success {
+            background: #22c55e;
             color: white;
         }
-        
-        .status.error {
-            background: #f44336;
+        .status-badge.error {
+            background: #ef4444;
             color: white;
         }
-        
-        .quick-test {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        .status-badge.warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .response-header {
+            display: flex;
+            align-items: center;
             gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .quick-test button {
-            padding: 10px;
-            font-size: 14px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧪 MoneyTalks API Tester</h1>
-        
-        <!-- Health Check -->
-        <div class="test-section">
-            <h2>1️⃣ Health Check</h2>
-            <button onclick="testHealth()">Test Health Endpoint</button>
-            <div id="health-response" class="response" style="display:none;"></div>
+        <div class="header">
+            <h1>💰 MoneyTalks API Tester</h1>
+            <p>Test all backend API endpoints directly in your browser</p>
         </div>
-        
-        <!-- Dashboard -->
-        <div class="test-section">
-            <h2>2️⃣ Dashboard API</h2>
-            <div class="input-group">
-                <label>User ID:</label>
-                <input type="text" id="dashboard-userId" value="demo-user-001" placeholder="Enter user ID">
+        <div class="content">
+            <!-- Dashboard Section -->
+            <div class="section">
+                <h2>📊 Dashboard</h2>
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="url">/api/dashboard?userId=demo-user-001</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="dashboard-userId" value="demo-user-001" placeholder="Enter user ID">
+                    </div>
+                    <button onclick="testDashboard()">Test Dashboard</button>
+                    <div id="dashboard-response" class="response" style="display: none;"></div>
+                </div>
             </div>
-            <button onclick="testDashboard()">Get Dashboard Data</button>
-            <div id="dashboard-response" class="response" style="display:none;"></div>
-        </div>
-        
-        <!-- Budgets -->
-        <div class="test-section">
-            <h2>3️⃣ Budgets API</h2>
-            <div class="quick-test">
-                <button onclick="testGetBudgets()">GET Budgets</button>
-                <button onclick="testCreateBudget()">POST Create Budget</button>
+
+            <!-- Budgets Section -->
+            <div class="section">
+                <h2>💰 Budgets</h2>
+                
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="url">/api/budgets?userId=demo-user-001</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="budgets-get-userId" value="demo-user-001">
+                    </div>
+                    <button onclick="testGetBudgets()">Get Budgets</button>
+                    <div id="budgets-get-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="url">/api/budgets/history?userId=demo-user-001&months=6</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="budgets-history-userId" value="demo-user-001">
+                    </div>
+                    <div class="input-group">
+                        <label>Months:</label>
+                        <input type="number" id="budgets-history-months" value="6" min="1" max="12">
+                    </div>
+                    <button onclick="testBudgetHistory()">Get Budget History</button>
+                    <div id="budgets-history-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="url">/api/budgets</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="budgets-post-userId" value="demo-user-001">
+                    </div>
+                    <div class="input-group">
+                        <label>Category:</label>
+                        <input type="text" id="budgets-post-category" value="Food" placeholder="e.g., Food, Shopping">
+                    </div>
+                    <div class="input-group">
+                        <label>Limit (RM):</label>
+                        <input type="number" id="budgets-post-limit" value="500" min="0" step="0.01">
+                    </div>
+                    <button onclick="testCreateBudget()">Create/Update Budget</button>
+                    <div id="budgets-post-response" class="response" style="display: none;"></div>
+                </div>
             </div>
-            <div class="input-group">
-                <label>User ID:</label>
-                <input type="text" id="budget-userId" value="demo-user-001">
+
+            <!-- Accounts Section -->
+            <div class="section">
+                <h2>🏦 Accounts</h2>
+                
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="url">/api/accounts?userId=demo-user-001</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="accounts-get-userId" value="demo-user-001">
+                    </div>
+                    <button onclick="testGetAccounts()">Get Accounts</button>
+                    <div id="accounts-get-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="url">/api/accounts</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="accounts-post-userId" value="demo-user-001">
+                    </div>
+                    <div class="input-group">
+                        <label>Bank Name:</label>
+                        <input type="text" id="accounts-post-bankName" value="Maybank">
+                    </div>
+                    <div class="input-group">
+                        <label>Account Type:</label>
+                        <input type="text" id="accounts-post-accountType" value="Savings">
+                    </div>
+                    <div class="input-group">
+                        <label>Masked Number:</label>
+                        <input type="text" id="accounts-post-maskedNumber" value="**** 1234">
+                    </div>
+                    <button onclick="testAddAccount()">Add Account</button>
+                    <div id="accounts-post-response" class="response" style="display: none;"></div>
+                </div>
             </div>
-            <div class="input-group">
-                <label>Category (for POST):</label>
-                <input type="text" id="budget-category" value="Food" placeholder="e.g., Food, Shopping">
+
+            <!-- Health Check -->
+            <div class="section">
+                <h2>💚 Health Check</h2>
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="url">/health</span>
+                    </div>
+                    <button onclick="testHealth()">Check Health</button>
+                    <div id="health-response" class="response" style="display: none;"></div>
+                </div>
             </div>
-            <div class="input-group">
-                <label>Limit (for POST):</label>
-                <input type="number" id="budget-limit" value="500" placeholder="e.g., 500">
-            </div>
-            <div id="budget-response" class="response" style="display:none;"></div>
-        </div>
-        
-        <!-- Accounts -->
-        <div class="test-section">
-            <h2>4️⃣ Accounts API</h2>
-            <div class="quick-test">
-                <button onclick="testGetAccounts()">GET Accounts</button>
-                <button onclick="testCreateAccount()">POST Create Account</button>
-            </div>
-            <div class="input-group">
-                <label>User ID:</label>
-                <input type="text" id="account-userId" value="demo-user-001">
-            </div>
-            <div class="input-group">
-                <label>Bank Name (for POST):</label>
-                <input type="text" id="account-bankName" value="Public Bank" placeholder="e.g., Maybank, CIMB">
-            </div>
-            <div class="input-group">
-                <label>Account Type (for POST):</label>
-                <input type="text" id="account-type" value="Savings" placeholder="e.g., Savings, Checking">
-            </div>
-            <div class="input-group">
-                <label>Masked Number (for POST):</label>
-                <input type="text" id="account-masked" value="**** 9999" placeholder="e.g., **** 1234">
-            </div>
-            <div id="account-response" class="response" style="display:none;"></div>
         </div>
     </div>
 
     <script>
         const API_BASE = 'http://localhost:3001';
-        
-        function showResponse(elementId, data, status) {
-            const responseDiv = document.getElementById(elementId);
-            responseDiv.style.display = 'block';
-            
-            const statusClass = status >= 200 && status < 300 ? 'success' : 'error';
-            responseDiv.innerHTML = `
-                <span class="status ${statusClass}">Status: ${status}</span>
-                <pre>${JSON.stringify(data, null, 2)}</pre>
-            `;
+
+        function getStatusBadgeClass(status) {
+            if (status >= 200 && status < 300) return 'success';
+            if (status >= 400 && status < 500) return 'warning';
+            if (status >= 500) return 'error';
+            return 'warning';
         }
-        
-        async function testHealth() {
-            try {
-                const response = await fetch(`${API_BASE}/health`);
-                const data = await response.json();
-                showResponse('health-response', data, response.status);
-            } catch (error) {
-                showResponse('health-response', { error: error.message }, 500);
+
+        function getStatusText(status) {
+            const statusTexts = {
+                200: 'OK',
+                201: 'Created',
+                400: 'Bad Request',
+                401: 'Unauthorized',
+                403: 'Forbidden',
+                404: 'Not Found',
+                500: 'Internal Server Error',
+                501: 'Not Implemented'
+            };
+            return statusTexts[status] || `Status ${status}`;
+        }
+
+        function showResponse(elementId, data, status = null) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            
+            // Clear previous content
+            element.innerHTML = '';
+            
+            // Add status badge if status is provided
+            if (status !== null) {
+                const statusBadge = document.createElement('div');
+                statusBadge.className = `status-badge ${getStatusBadgeClass(status)}`;
+                statusBadge.textContent = `${status} ${getStatusText(status)}`;
+                element.appendChild(statusBadge);
+            }
+            
+            // Add response data
+            const dataElement = document.createElement('pre');
+            dataElement.style.margin = '0';
+            dataElement.style.whiteSpace = 'pre-wrap';
+            dataElement.style.wordWrap = 'break-word';
+            dataElement.textContent = JSON.stringify(data, null, 2);
+            element.appendChild(dataElement);
+            
+            // Set background color based on status
+            if (status) {
+                const statusClass = status >= 200 && status < 300 ? 'success' : 'error';
+                element.className = `response ${statusClass}`;
+            } else {
+                element.className = 'response';
             }
         }
-        
+
         async function testDashboard() {
             const userId = document.getElementById('dashboard-userId').value;
             try {
@@ -243,22 +383,34 @@
                 showResponse('dashboard-response', { error: error.message }, 500);
             }
         }
-        
+
         async function testGetBudgets() {
-            const userId = document.getElementById('budget-userId').value;
+            const userId = document.getElementById('budgets-get-userId').value;
             try {
                 const response = await fetch(`${API_BASE}/api/budgets?userId=${userId}`);
                 const data = await response.json();
-                showResponse('budget-response', data, response.status);
+                showResponse('budgets-get-response', data, response.status);
             } catch (error) {
-                showResponse('budget-response', { error: error.message }, 500);
+                showResponse('budgets-get-response', { error: error.message }, 500);
             }
         }
-        
+
+        async function testBudgetHistory() {
+            const userId = document.getElementById('budgets-history-userId').value;
+            const months = document.getElementById('budgets-history-months').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/budgets/history?userId=${userId}&months=${months}`);
+                const data = await response.json();
+                showResponse('budgets-history-response', data, response.status);
+            } catch (error) {
+                showResponse('budgets-history-response', { error: error.message }, 500);
+            }
+        }
+
         async function testCreateBudget() {
-            const userId = document.getElementById('budget-userId').value;
-            const category = document.getElementById('budget-category').value;
-            const limit = parseFloat(document.getElementById('budget-limit').value);
+            const userId = document.getElementById('budgets-post-userId').value;
+            const category = document.getElementById('budgets-post-category').value;
+            const limit = parseFloat(document.getElementById('budgets-post-limit').value);
             
             try {
                 const response = await fetch(`${API_BASE}/api/budgets`, {
@@ -267,28 +419,28 @@
                     body: JSON.stringify({ userId, category, limit })
                 });
                 const data = await response.json();
-                showResponse('budget-response', data, response.status);
+                showResponse('budgets-post-response', data, response.status);
             } catch (error) {
-                showResponse('budget-response', { error: error.message }, 500);
+                showResponse('budgets-post-response', { error: error.message }, 500);
             }
         }
-        
+
         async function testGetAccounts() {
-            const userId = document.getElementById('account-userId').value;
+            const userId = document.getElementById('accounts-get-userId').value;
             try {
                 const response = await fetch(`${API_BASE}/api/accounts?userId=${userId}`);
                 const data = await response.json();
-                showResponse('account-response', data, response.status);
+                showResponse('accounts-get-response', data, response.status);
             } catch (error) {
-                showResponse('account-response', { error: error.message }, 500);
+                showResponse('accounts-get-response', { error: error.message }, 500);
             }
         }
-        
-        async function testCreateAccount() {
-            const userId = document.getElementById('account-userId').value;
-            const bankName = document.getElementById('account-bankName').value;
-            const accountType = document.getElementById('account-type').value;
-            const maskedNumber = document.getElementById('account-masked').value;
+
+        async function testAddAccount() {
+            const userId = document.getElementById('accounts-post-userId').value;
+            const bankName = document.getElementById('accounts-post-bankName').value;
+            const accountType = document.getElementById('accounts-post-accountType').value;
+            const maskedNumber = document.getElementById('accounts-post-maskedNumber').value;
             
             try {
                 const response = await fetch(`${API_BASE}/api/accounts`, {
@@ -297,9 +449,19 @@
                     body: JSON.stringify({ userId, bankName, accountType, maskedNumber })
                 });
                 const data = await response.json();
-                showResponse('account-response', data, response.status);
+                showResponse('accounts-post-response', data, response.status);
             } catch (error) {
-                showResponse('account-response', { error: error.message }, 500);
+                showResponse('accounts-post-response', { error: error.message }, 500);
+            }
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                showResponse('health-response', data, response.status);
+            } catch (error) {
+                showResponse('health-response', { error: error.message }, 500);
             }
         }
     </script>

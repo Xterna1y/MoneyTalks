@@ -30,6 +30,14 @@ Server runs on: **http://localhost:3001**
 npm run seed
 ```
 
+### Test API Endpoints
+Open `test-api.html` in your browser to test all API endpoints with a visual interface:
+- Shows HTTP status codes (200, 201, 400, 500, etc.)
+- Interactive forms for all endpoints
+- Real-time JSON response display
+
+**Location:** `backend/test-api.html`
+
 ---
 
 ## 📁 Project Structure

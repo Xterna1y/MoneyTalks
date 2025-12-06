@@ -1,2 +1,26 @@
-
+# Environment variables
 .env.local
+.env
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Convex generated files (keep in repo, but ignore if regenerated)
+# convex/_generated/ is tracked but don't edit manually
+
+# IMPORTANT: test-api.html is a developer tool - DO NOT ignore it!
+# !test-api.html

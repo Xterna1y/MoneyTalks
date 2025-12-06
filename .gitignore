@@ -1,4 +1,6 @@
-# Node artifacts
+# Root level ignores
+
+# Dependencies
 node_modules/
 
 # Environment files
@@ -6,11 +8,21 @@ node_modules/
 .env.local
 .env.*.local
 
-# Output artifacts
-*.log
-voice-output.mp3
-
-# OS noise
+# OS files
 .DS_Store
 Thumbs.db
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Package locks (keep in subdirectories, not root)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

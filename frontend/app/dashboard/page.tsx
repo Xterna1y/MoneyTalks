@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { AlertTriangle, Banknote, Link2, PhoneCall, PlusCircle, TrendingUp } from "lucide-react"
 import {
   Area,
@@ -13,25 +14,133 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
-
-const weeklySpend = [
-  { day: "Mon", spent: 95 },
-  { day: "Tue", spent: 120 },
-  { day: "Wed", spent: 80 },
-  { day: "Thu", spent: 140 },
-  { day: "Fri", spent: 110 },
-  { day: "Sat", spent: 160 },
-  { day: "Sun", spent: 90 },
-]
-
-const accounts = [
-  { name: "Maybank Savings", masked: "••9832", balance: "RM 2,150.00", linked: true },
-  { name: "CIMB Debit", masked: "••4471", balance: "RM 820.50", linked: true },
-  { name: "RYT Bank", masked: "••5620", balance: "RM 1,420.75", linked: true },
-  { name: "Add a bank", masked: "", balance: "Tap to connect", linked: false },
-]
+import { fetchDashboard, fetchAccounts, fetchBudgets, DEFAULT_USER_ID } from "@/lib/api"
 
 export default function DashboardPage() {
+  const [dashboardData, setDashboardData] = useState<any>(null)
+  const [accounts, setAccounts] = useState<any[]>([])
+  const [budgets, setBudgets] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true)
+        const [dashboard, accountsData, budgetsData] = await Promise.all([
+          fetchDashboard(DEFAULT_USER_ID),
+          fetchAccounts(DEFAULT_USER_ID),
+          fetchBudgets(DEFAULT_USER_ID),
+        ])
+        setDashboardData(dashboard)
+        setAccounts(accountsData)
+        setBudgets(budgetsData)
+        setError(null)
+      } catch (err) {
+        console.error("Error loading dashboard:", err)
+        setError("Failed to load dashboard. Make sure backend is running on http://localhost:3001")
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [])
+
+  // Calculate weekly spending from recent transactions
+  const calculateWeeklySpending = () => {
+    if (!dashboardData?.recentTransactions) {
+      return [
+        { day: "Mon", spent: 0 },
+        { day: "Tue", spent: 0 },
+        { day: "Wed", spent: 0 },
+        { day: "Thu", spent: 0 },
+        { day: "Fri", spent: 0 },
+        { day: "Sat", spent: 0 },
+        { day: "Sun", spent: 0 },
+      ]
+    }
+
+    const now = new Date()
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() - now.getDay()) // Start of week (Sunday)
+    startOfWeek.setHours(0, 0, 0, 0)
+
+    const dayTotals = new Map<string, number>()
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+    dashboardData.recentTransactions.forEach((tx: any) => {
+      const txDate = new Date(tx.createdAt)
+      if (txDate >= startOfWeek) {
+        const dayName = dayNames[txDate.getDay()]
+        dayTotals.set(dayName, (dayTotals.get(dayName) || 0) + tx.amount)
+      }
+    })
+
+    return dayNames.map((day) => ({
+      day,
+      spent: Math.round(dayTotals.get(day) || 0),
+    }))
+  }
+
+  // Check for budget alerts
+  const getBudgetAlerts = () => {
+    if (!dashboardData?.byCategory || !budgets.length) return []
+
+    const categorySpending = new Map<string, number>()
+    dashboardData.byCategory.forEach((cat: any) => {
+      categorySpending.set(cat.name, cat.amount)
+    })
+
+    const alerts: any[] = []
+    budgets.forEach((budget) => {
+      const spent = categorySpending.get(budget.category) || 0
+      const percent = (spent / budget.limit) * 100
+
+      if (percent >= 100) {
+        alerts.push({
+          title: `Over budget: ${budget.category}`,
+          detail: `Spent RM ${spent.toFixed(2)} of RM ${budget.limit.toFixed(2)}`,
+          tone: "warn",
+        })
+      } else if (percent >= 80) {
+        alerts.push({
+          title: `Near budget limit: ${budget.category}`,
+          detail: `${percent.toFixed(0)}% of budget used`,
+          tone: "warn",
+        })
+      }
+    })
+
+    return alerts
+  }
+
+  const weeklySpend = calculateWeeklySpending()
+  const budgetAlerts = getBudgetAlerts()
+  const totalThisMonth = dashboardData?.totalThisMonth || 0
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-slate-50 p-4 text-slate-900">
+        <div className="mx-auto max-w-md space-y-6 pt-8">
+          <div className="text-center text-lg text-slate-600">Loading dashboard...</div>
+        </div>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-slate-50 p-4 text-slate-900">
+        <div className="mx-auto max-w-md space-y-6 pt-8">
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-4">
+              <p className="text-red-800">{error}</p>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    )
+  }
   return (
     <main className="min-h-screen bg-slate-50 p-4 text-slate-900">
       <div className="mx-auto flex max-w-md flex-col gap-6 pt-8">
@@ -39,11 +148,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 gap-3">
           <Card className="border-slate-200 bg-white shadow-md">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-slate-600">Total Balance</CardTitle>
+              <CardTitle className="text-sm text-slate-600">Spent This Month</CardTitle>
             </CardHeader>
             <CardContent className="pb-4">
-              <p className="text-3xl font-bold text-slate-900">RM 4,250.00</p>
-              <p className="text-sm text-emerald-600">+RM 120 today</p>
+              <p className="text-3xl font-bold text-slate-900">RM {totalThisMonth.toFixed(2)}</p>
+              <p className="text-sm text-emerald-600">Current month total</p>
             </CardContent>
           </Card>
           <Card className="border-slate-200 bg-white shadow-md">
@@ -93,21 +202,24 @@ export default function DashboardPage() {
         </Card>
 
         {/* Recent Alerts */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-600">Recent Alerts</h2>
-          <Card className="border-amber-200 bg-amber-50">
-            <CardContent className="flex items-center gap-3 p-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-                <AlertTriangle className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-base font-semibold text-amber-800">
-                  Electric bill is due tomorrow.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {budgetAlerts.length > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold text-slate-600">Recent Alerts</h2>
+            {budgetAlerts.map((alert, idx) => (
+              <Card key={idx} className="border-amber-200 bg-amber-50">
+                <CardContent className="flex items-center gap-3 p-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                    <AlertTriangle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold text-amber-800">{alert.title}</p>
+                    <p className="text-sm text-amber-700">{alert.detail}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Accounts */}
         <Card className="border-slate-200 bg-white shadow-md">
@@ -119,27 +231,26 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
-            {accounts.map((acct, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-3 shadow-sm"
-              >
-                <div>
-                  <p className="font-semibold text-slate-900">{acct.name}</p>
-                  <p className="text-sm text-slate-600">
-                    {acct.linked ? acct.masked : "Securely connect your bank"}
-                  </p>
+            {accounts.length > 0 ? (
+              accounts.map((acct) => (
+                <div
+                  key={acct.id}
+                  className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-3 shadow-sm"
+                >
+                  <div>
+                    <p className="font-semibold text-slate-900">{acct.bankName}</p>
+                    <p className="text-sm text-slate-600">
+                      {acct.accountType} • {acct.maskedNumber}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold text-slate-900">{acct.linked ? acct.balance : ""}</p>
-                  {!acct.linked && (
-                    <Button size="sm" variant="outline" className="mt-1 border-emerald-600 text-emerald-700 hover:bg-emerald-50">
-                      Connect
-                    </Button>
-                  )}
-                </div>
+              ))
+            ) : (
+              <div className="text-center text-slate-600 py-4">
+                <p>No accounts linked yet</p>
+                <p className="text-sm mt-1">Link a bank account to get started</p>
               </div>
-            ))}
+            )}
           </CardContent>
         </Card>
 

@@ -18,6 +18,30 @@ function getConvexClient() {
 }
 
 /**
+ * GET /api/budgets/history
+ * Get monthly budget history for a user
+ * Query params: userId (required), months (optional, default: 6)
+ */
+router.get("/history", async (req, res) => {
+  try {
+    const { userId, months } = req.query;
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({ error: "Missing or invalid userId parameter" });
+    }
+    
+    const monthsParam = months ? parseInt(months, 10) : undefined;
+    const history = await getConvexClient().query(
+      api.functions.transactions.getMonthlyBudgetHistory,
+      { userId, months: monthsParam }
+    );
+    return res.json(history);
+  } catch (error) {
+    console.error("Error fetching budget history:", error);
+    return res.status(500).json({ error: "Failed to fetch budget history" });
+  }
+});
+
+/**
  * GET /api/budgets
  * Get all budgets for a user
  * Query params: userId (required)
