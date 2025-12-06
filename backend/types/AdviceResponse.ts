@@ -1,0 +1,2 @@
+// AdviceResponse TypeScript interfaces
+
