@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
-// Load environment variables from root .env.local before other imports use them.
-config({ path: '../.env.local' });
+// Load environment variables from the local env file before other imports use them.
+config({ path: '.env.local' });
 
 import { analyzeFinances } from '../lib/anthropic';
 import { generateSpeech } from '../lib/elevenlabs';

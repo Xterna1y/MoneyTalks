@@ -302,6 +302,92 @@
                 </div>
             </div>
 
+            <!-- Prompts & AI Responses -->
+            <div class="section">
+                <h2>💬 Prompts & AI Responses</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="url">/api/prompts</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="prompts-post-userId" value="demo-user-001">
+                    </div>
+                    <div class="input-group">
+                        <label>Prompt:</label>
+                        <input type="text" id="prompts-post-prompt" value="How is my spending this month?">
+                    </div>
+                    <button onclick="createPrompt()">Create Prompt</button>
+                    <div id="prompts-post-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="url">/api/prompts?userId=demo-user-001&status=pending</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="prompts-get-userId" value="demo-user-001">
+                    </div>
+                    <div class="input-group">
+                        <label>Status (optional):</label>
+                        <input type="text" id="prompts-get-status" placeholder="pending|processing|completed|error">
+                    </div>
+                    <button onclick="getPrompts()">Get Prompts</button>
+                    <div id="prompts-get-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="url">/api/prompts/:promptId</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Prompt ID:</label>
+                        <input type="text" id="prompts-getOne-id" placeholder="Enter promptId">
+                    </div>
+                    <button onclick="getPrompt()">Get Prompt</button>
+                    <div id="prompts-getOne-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">PUT</span>
+                        <span class="url">/api/prompts/:promptId/response</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Prompt ID:</label>
+                        <input type="text" id="prompts-put-id" placeholder="Enter promptId">
+                    </div>
+                    <div class="input-group">
+                        <label>Response:</label>
+                        <input type="text" id="prompts-put-response-text" placeholder="AI response text">
+                    </div>
+                    <button onclick="updatePromptResponse()">Update Response</button>
+                    <div id="prompts-put-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">PUT</span>
+                        <span class="url">/api/prompts/:promptId/status</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Prompt ID:</label>
+                        <input type="text" id="prompts-put-status-id" placeholder="Enter promptId">
+                    </div>
+                    <div class="input-group">
+                        <label>Status:</label>
+                        <input type="text" id="prompts-put-status" placeholder="pending|processing|completed|error">
+                    </div>
+                    <button onclick="updatePromptStatus()">Update Status</button>
+                    <div id="prompts-put-status-response" class="response" style="display: none;"></div>
+                </div>
+            </div>
+
             <!-- Health Check -->
             <div class="section">
                 <h2>💚 Health Check</h2>
@@ -452,6 +538,85 @@
                 showResponse('accounts-post-response', data, response.status);
             } catch (error) {
                 showResponse('accounts-post-response', { error: error.message }, 500);
+            }
+        }
+
+        // Prompts
+        async function createPrompt() {
+            const userId = document.getElementById('prompts-post-userId').value;
+            const prompt = document.getElementById('prompts-post-prompt').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/prompts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, prompt })
+                });
+                const data = await response.json();
+                showResponse('prompts-post-response', data, response.status);
+                // Autofill promptId for subsequent calls if present
+                if (data.promptId) {
+                    document.getElementById('prompts-getOne-id').value = data.promptId;
+                    document.getElementById('prompts-put-id').value = data.promptId;
+                    document.getElementById('prompts-put-status-id').value = data.promptId;
+                }
+            } catch (error) {
+                showResponse('prompts-post-response', { error: error.message }, 500);
+            }
+        }
+
+        async function getPrompts() {
+            const userId = document.getElementById('prompts-get-userId').value;
+            const status = document.getElementById('prompts-get-status').value;
+            const statusParam = status ? `&status=${encodeURIComponent(status)}` : '';
+            try {
+                const response = await fetch(`${API_BASE}/api/prompts?userId=${encodeURIComponent(userId)}${statusParam}`);
+                const data = await response.json();
+                showResponse('prompts-get-response', data, response.status);
+            } catch (error) {
+                showResponse('prompts-get-response', { error: error.message }, 500);
+            }
+        }
+
+        async function getPrompt() {
+            const promptId = document.getElementById('prompts-getOne-id').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/prompts/${promptId}`);
+                const data = await response.json();
+                showResponse('prompts-getOne-response', data, response.status);
+            } catch (error) {
+                showResponse('prompts-getOne-response', { error: error.message }, 500);
+            }
+        }
+
+        async function updatePromptResponse() {
+            const promptId = document.getElementById('prompts-put-id').value;
+            const responseText = document.getElementById('prompts-put-response-text').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/prompts/${promptId}/response`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ response: responseText })
+                });
+                const data = await response.json();
+                showResponse('prompts-put-response', data, response.status);
+            } catch (error) {
+                showResponse('prompts-put-response', { error: error.message }, 500);
+            }
+        }
+
+        async function updatePromptStatus() {
+            const promptId = document.getElementById('prompts-put-status-id').value;
+            const status = document.getElementById('prompts-put-status').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/prompts/${promptId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                const data = await response.json();
+                showResponse('prompts-put-status-response', data, response.status);
+            } catch (error) {
+                showResponse('prompts-put-status-response', { error: error.message }, 500);
             }
         }
 
