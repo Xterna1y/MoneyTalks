@@ -87,13 +87,24 @@ router.post("/", async (req, res) => {
     });
 
     // 6) Generate speech
-    const audioBuffer = await generateSpeechBuffer(aiResponse);
+    console.log("Generating speech for response:", aiResponse.substring(0, 50) + "...");
+    let audioBuffer;
+    try {
+      audioBuffer = await generateSpeechBuffer(aiResponse);
+      console.log("Speech generated successfully, buffer size:", audioBuffer.length);
+    } catch (ttsError) {
+      console.error("ElevenLabs TTS error:", ttsError);
+      throw new Error(`Text-to-speech failed: ${ttsError.message || "Unknown error"}`);
+    }
 
     // 7) Return text + audio (base64) to frontend
+    const audioBase64 = audioBuffer.toString("base64");
+    console.log("Returning response with audio base64 length:", audioBase64.length);
+    
     return res.json({
       promptId,
       textResponse: aiResponse,
-      audioBase64: audioBuffer.toString("base64"),
+      audioBase64,
       contentType: "audio/mpeg",
       status: "completed",
     });

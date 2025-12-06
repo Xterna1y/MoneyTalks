@@ -4,6 +4,10 @@ import { BrowserRouter } from "react-router-dom"
 import App from "./App"
 import "@fontsource/inter"
 import "./index.css"
+import { initTheme } from "./lib/theme"
+
+// Initialize theme on app load
+initTheme()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

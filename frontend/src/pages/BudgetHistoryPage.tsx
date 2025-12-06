@@ -53,9 +53,9 @@ export default function BudgetHistoryPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-50 p-4 text-slate-900">
-        <div className="mx-auto max-w-md space-y-6 pt-8">
-          <div className="text-center text-lg text-slate-600">Loading budget history...</div>
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50 px-6 pt-20 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100">
+        <div className="mx-auto max-w-md space-y-6">
+          <div className="text-center text-lg text-slate-600 dark:text-slate-400">Loading budget history...</div>
         </div>
       </main>
     )
@@ -63,11 +63,11 @@ export default function BudgetHistoryPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-slate-50 p-4 text-slate-900">
-        <div className="mx-auto max-w-md space-y-6 pt-8">
-          <Card className="border-red-200 bg-red-50">
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50 px-6 pt-20 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100">
+        <div className="mx-auto max-w-md space-y-6">
+          <Card className="border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20">
             <CardContent className="p-4">
-              <p className="text-red-800">{error}</p>
+              <p className="text-red-800 dark:text-red-300">{error}</p>
             </CardContent>
           </Card>
         </div>
@@ -76,17 +76,17 @@ export default function BudgetHistoryPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 text-slate-900">
-      <div className="mx-auto flex max-w-md flex-col gap-6 pt-8">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50 px-6 pt-20 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100">
+      <div className="mx-auto flex max-w-md flex-col gap-6">
         <div className="flex items-center gap-2">
-          <Clock3 className="h-6 w-6 text-emerald-600" />
-          <h1 className="text-2xl font-semibold">Budget History</h1>
+          <Clock3 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+          <h1 className="text-2xl font-semibold dark:text-slate-100">Budget History</h1>
         </div>
 
-        <Card className="border-slate-200 bg-white shadow-md">
+        <Card className="border-slate-200 bg-white shadow-md dark:border-slate-700 dark:bg-slate-800">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg text-slate-800">Monthly Recap</CardTitle>
-            <Wallet className="h-6 w-6 text-emerald-600" />
+            <CardTitle className="text-lg text-slate-800 dark:text-slate-100">Monthly Recap</CardTitle>
+            <Wallet className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
           </CardHeader>
           <CardContent className="space-y-4">
             {monthlyHistory.length > 0 ? (
@@ -95,8 +95,8 @@ export default function BudgetHistoryPage() {
                 return (
                   <div key={month.monthKey} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-800">{month.month}</span>
-                      <span className="text-slate-600">
+                      <span className="text-slate-800 dark:text-slate-200">{month.month}</span>
+                      <span className="text-slate-600 dark:text-slate-400">
                         RM {month.spent.toFixed(2)} / RM {month.limit.toFixed(2)}
                       </span>
                     </div>
@@ -105,34 +105,34 @@ export default function BudgetHistoryPage() {
                 )
               })
             ) : (
-              <div className="text-center text-slate-600 py-4">
+              <div className="text-center text-slate-600 dark:text-slate-400 py-4">
                 No budget history available. Set up budgets and make transactions to see your history!
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 bg-white shadow-md">
+        <Card className="border-slate-200 bg-white shadow-md dark:border-slate-700 dark:bg-slate-800">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg text-slate-800">Recent Deductions</CardTitle>
-            <TrendingDown className="h-6 w-6 text-amber-500" />
+            <CardTitle className="text-lg text-slate-800 dark:text-slate-100">Recent Deductions</CardTitle>
+            <TrendingDown className="h-6 w-6 text-amber-500 dark:text-amber-400" />
           </CardHeader>
           <CardContent className="space-y-3">
             {dashboardData?.recentTransactions && dashboardData.recentTransactions.length > 0 ? (
               dashboardData.recentTransactions.map((transaction: any) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3 shadow-sm"
+                  className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-700"
                 >
                   <div className="space-y-1">
-                    <p className="font-medium text-slate-900">{transaction.merchant}</p>
-                    <p className="text-xs text-slate-600">{formatTransactionDate(transaction.createdAt)}</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">{transaction.merchant}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">{formatTransactionDate(transaction.createdAt)}</p>
                   </div>
-                  <p className="text-sm font-semibold text-red-500">- RM {transaction.amount.toFixed(2)}</p>
+                  <p className="text-sm font-semibold text-red-500 dark:text-red-400">- RM {transaction.amount.toFixed(2)}</p>
                 </div>
               ))
             ) : (
-              <div className="text-center text-slate-600 py-4">No recent transactions</div>
+              <div className="text-center text-slate-600 dark:text-slate-400 py-4">No recent transactions</div>
             )}
           </CardContent>
         </Card>

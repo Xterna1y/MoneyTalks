@@ -134,7 +134,25 @@
             border-radius: 6px;
             font-size: 0.9rem;
         }
-        .input-group input:focus {
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+        .input-group textarea {
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+        .input-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+        .input-group select:focus {
             outline: none;
             border-color: #22c55e;
             box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
@@ -299,6 +317,103 @@
                     </div>
                     <button onclick="testAddAccount()">Add Account</button>
                     <div id="accounts-post-response" class="response" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Spending Patterns Section -->
+            <div class="section">
+                <h2>📈 Spending Patterns</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="url">/api/spending-patterns</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="patterns-post-userId" value="demo-user-001">
+                    </div>
+                    <div class="input-group">
+                        <label>Pattern Type:</label>
+                        <select id="patterns-post-type">
+                            <option value="weekly">Weekly (Day of Week)</option>
+                            <option value="monthly">Monthly (Week of Month)</option>
+                            <option value="category">Category</option>
+                            <option value="time_of_day">Time of Day</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Pattern Data (JSON):</label>
+                        <textarea id="patterns-post-data" rows="10" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.85rem;">{
+  "Monday": 150.50,
+  "Tuesday": 200.00,
+  "Wednesday": 180.75,
+  "Thursday": 220.00,
+  "Friday": 300.50,
+  "Saturday": 250.00,
+  "Sunday": 100.00
+}</textarea>
+                        <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 4px;">
+                            💡 Examples: 
+                            <span onclick="setPatternExample('weekly')" style="cursor: pointer; text-decoration: underline;">Weekly</span> | 
+                            <span onclick="setPatternExample('monthly')" style="cursor: pointer; text-decoration: underline;">Monthly</span> | 
+                            <span onclick="setPatternExample('category')" style="cursor: pointer; text-decoration: underline;">Category</span> | 
+                            <span onclick="setPatternExample('time_of_day')" style="cursor: pointer; text-decoration: underline;">Time of Day</span>
+                        </small>
+                    </div>
+                    <div class="input-group">
+                        <label>AI Analysis (Optional):</label>
+                        <textarea id="patterns-post-analysis" rows="3" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.85rem;" placeholder="Optional: AI-generated analysis of the spending pattern"></textarea>
+                    </div>
+                    <button onclick="createSpendingPattern()">Create/Update Pattern</button>
+                    <div id="patterns-post-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="url">/api/spending-patterns?userId=xxx&patternType=xxx</span>
+                    </div>
+                    <div class="input-group">
+                        <label>User ID:</label>
+                        <input type="text" id="patterns-get-userId" value="demo-user-001">
+                    </div>
+                    <div class="input-group">
+                        <label>Pattern Type (optional - leave empty for all):</label>
+                        <input type="text" id="patterns-get-type" placeholder="weekly|monthly|category|time_of_day">
+                    </div>
+                    <button onclick="getSpendingPatterns()">Get Patterns</button>
+                    <div id="patterns-get-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">PUT</span>
+                        <span class="url">/api/spending-patterns/:patternId/analysis</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Pattern ID:</label>
+                        <input type="text" id="patterns-put-analysis-id" placeholder="Enter patternId">
+                    </div>
+                    <div class="input-group">
+                        <label>AI Analysis:</label>
+                        <textarea id="patterns-put-analysis-text" rows="4" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.85rem;" placeholder="Enter AI analysis/insights about the spending pattern"></textarea>
+                    </div>
+                    <button onclick="updatePatternAnalysis()">Update AI Analysis</button>
+                    <div id="patterns-put-analysis-response" class="response" style="display: none;"></div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method delete">DELETE</span>
+                        <span class="url">/api/spending-patterns/:patternId</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Pattern ID:</label>
+                        <input type="text" id="patterns-delete-id" placeholder="Enter patternId">
+                    </div>
+                    <button onclick="deleteSpendingPattern()">Delete Pattern</button>
+                    <div id="patterns-delete-response" class="response" style="display: none;"></div>
                 </div>
             </div>
 
@@ -627,6 +742,139 @@
                 showResponse('health-response', data, response.status);
             } catch (error) {
                 showResponse('health-response', { error: error.message }, 500);
+            }
+        }
+
+        // Spending Patterns
+        function setPatternExample(type) {
+            const typeSelect = document.getElementById('patterns-post-type');
+            const dataTextarea = document.getElementById('patterns-post-data');
+            
+            typeSelect.value = type;
+            
+            const examples = {
+                weekly: {
+                    "Monday": 150.50,
+                    "Tuesday": 200.00,
+                    "Wednesday": 180.75,
+                    "Thursday": 220.00,
+                    "Friday": 300.50,
+                    "Saturday": 250.00,
+                    "Sunday": 100.00
+                },
+                monthly: {
+                    "week1": 500.00,
+                    "week2": 600.50,
+                    "week3": 550.25,
+                    "week4": 700.00
+                },
+                category: {
+                    "Food": 800.00,
+                    "Shopping": 500.50,
+                    "Transport": 300.00,
+                    "Entertainment": 200.00,
+                    "Utilities": 400.00
+                },
+                time_of_day: {
+                    "morning": 200.00,
+                    "afternoon": 400.50,
+                    "evening": 300.00,
+                    "night": 150.00
+                }
+            };
+            
+            dataTextarea.value = JSON.stringify(examples[type], null, 2);
+        }
+
+        async function createSpendingPattern() {
+            const userId = document.getElementById('patterns-post-userId').value;
+            const patternType = document.getElementById('patterns-post-type').value;
+            const patternDataText = document.getElementById('patterns-post-data').value;
+            const aiAnalysis = document.getElementById('patterns-post-analysis').value.trim();
+            
+            let patternData;
+            try {
+                patternData = JSON.parse(patternDataText);
+            } catch (error) {
+                showResponse('patterns-post-response', { error: 'Invalid JSON in pattern data: ' + error.message }, 400);
+                return;
+            }
+            
+            const body = { userId, patternType, patternData };
+            if (aiAnalysis) {
+                body.aiAnalysis = aiAnalysis;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/spending-patterns`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await response.json();
+                showResponse('patterns-post-response', data, response.status);
+            } catch (error) {
+                showResponse('patterns-post-response', { error: error.message }, 500);
+            }
+        }
+
+        async function getSpendingPatterns() {
+            const userId = document.getElementById('patterns-get-userId').value;
+            const patternType = document.getElementById('patterns-get-type').value;
+            const typeParam = patternType ? `&patternType=${encodeURIComponent(patternType)}` : '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/spending-patterns?userId=${encodeURIComponent(userId)}${typeParam}`);
+                const data = await response.json();
+                showResponse('patterns-get-response', data, response.status);
+            } catch (error) {
+                showResponse('patterns-get-response', { error: error.message }, 500);
+            }
+        }
+
+        async function updatePatternAnalysis() {
+            const patternId = document.getElementById('patterns-put-analysis-id').value;
+            const aiAnalysis = document.getElementById('patterns-put-analysis-text').value;
+            
+            if (!patternId) {
+                showResponse('patterns-put-analysis-response', { error: 'Pattern ID is required' }, 400);
+                return;
+            }
+            
+            if (!aiAnalysis) {
+                showResponse('patterns-put-analysis-response', { error: 'AI Analysis is required' }, 400);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/spending-patterns/${patternId}/analysis`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ aiAnalysis })
+                });
+                const data = await response.json();
+                showResponse('patterns-put-analysis-response', data, response.status);
+            } catch (error) {
+                showResponse('patterns-put-analysis-response', { error: error.message }, 500);
+            }
+        }
+
+        async function deleteSpendingPattern() {
+            const patternId = document.getElementById('patterns-delete-id').value;
+            
+            if (!patternId) {
+                showResponse('patterns-delete-response', { error: 'Pattern ID is required' }, 400);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/spending-patterns/${patternId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                showResponse('patterns-delete-response', data, response.status);
+            } catch (error) {
+                showResponse('patterns-delete-response', { error: error.message }, 500);
             }
         }
     </script>

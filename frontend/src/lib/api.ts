@@ -78,17 +78,35 @@ export async function processVoicePrompt(
   text: string,
   userId: string = DEFAULT_USER_ID
 ): Promise<{ promptId: string; textResponse: string; audioBase64: string; contentType: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/voice-flow`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, text }),
-  })
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/voice-flow`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, text }),
+    })
 
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => response.statusText)
-    throw new Error(`Failed to process voice prompt: ${errorText}`)
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => response.statusText)
+      console.error("API error response:", { status: response.status, statusText: response.statusText, errorText })
+      throw new Error(`Failed to process voice prompt (${response.status}): ${errorText}`)
+    }
+
+    const data = await response.json()
+    console.log("API response received:", { 
+      hasPromptId: !!data.promptId, 
+      hasTextResponse: !!data.textResponse,
+      hasAudioBase64: !!data.audioBase64,
+      audioBase64Length: data.audioBase64?.length 
+    })
+    
+    if (!data.audioBase64) {
+      throw new Error("Server response missing audioBase64 field")
+    }
+    
+    return data
+  } catch (error) {
+    console.error("Error in processVoicePrompt:", error)
+    throw error
   }
-
-  return response.json()
 }
 

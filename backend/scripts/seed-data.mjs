@@ -228,6 +228,19 @@ async function seedData() {
     });
     console.log("   ✅ Unifi Internet - RM 89.00");
 
+    // Today's transaction
+    await client.mutation(api.functions.transactions.createTransaction, {
+      userId: USER_ID,
+      accountId: account1.accountId,
+      amount: 32.50,
+      merchant: "7-Eleven",
+      category: "Food",
+      createdAt: now, // Today's timestamp
+      riskScore: 3,
+      riskLevel: "low",
+    });
+    console.log("   ✅ 7-Eleven (Today) - RM 32.50");
+
     // ============ SUMMARY ============
     console.log("\n" + "═".repeat(50));
     console.log("🎉 SEED DATA COMPLETE!");
@@ -236,7 +249,7 @@ async function seedData() {
     console.log("   • User ID: " + USER_ID);
     console.log("   • Accounts: 3 (Maybank, CIMB, RHB)");
     console.log("   • Budgets: 5 categories");
-    console.log("   • Transactions: 11 records");
+    console.log("   • Transactions: 12 records (including 1 for today)");
     console.log("\n🧪 Test the API:");
     console.log("   GET http://localhost:3001/api/dashboard?userId=" + USER_ID);
     console.log("   GET http://localhost:3001/api/budgets?userId=" + USER_ID);

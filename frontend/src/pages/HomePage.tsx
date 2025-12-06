@@ -246,17 +246,52 @@ export default function HomePage() {
         throw new Error("No transcript to send")
       }
 
+      console.log("Sending transcript to API:", text)
       const result = await processVoicePrompt(text, DEFAULT_USER_ID)
+      console.log("Received response from API:", { 
+        hasAudio: !!result.audioBase64, 
+        hasText: !!result.textResponse,
+        audioLength: result.audioBase64?.length 
+      })
 
-      const binary = Uint8Array.from(atob(result.audioBase64), (c) => c.charCodeAt(0))
-      const audioBlob = new Blob([binary], { type: result.contentType || "audio/mpeg" })
+      if (!result.audioBase64) {
+        throw new Error("No audio data received from server")
+      }
 
-      await playAudio(audioBlob)
-      setTranscript(result.textResponse || transcript)
+      if (result.audioBase64.length === 0) {
+        throw new Error("Audio data is empty")
+      }
+
+      // Decode base64 audio
+      try {
+        const binaryString = atob(result.audioBase64)
+        if (binaryString.length === 0) {
+          throw new Error("Decoded audio data is empty")
+        }
+        
+        const bytes = new Uint8Array(binaryString.length)
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i)
+        }
+        const audioBlob = new Blob([bytes], { type: result.contentType || "audio/mpeg" })
+        console.log("Created audio blob:", { size: audioBlob.size, type: audioBlob.type })
+
+        if (audioBlob.size === 0) {
+          throw new Error("Audio blob is empty after creation")
+        }
+
+        await playAudio(audioBlob)
+        setTranscript(result.textResponse || text)
+      } catch (audioError) {
+        console.error("Error decoding audio:", audioError)
+        throw new Error(`Failed to decode audio: ${audioError instanceof Error ? audioError.message : "Unknown error"}`)
+      }
     } catch (err) {
+      console.error("Error in sendTranscript:", err)
       setStatus("error")
-      setError("Failed to process voice. Please try again.")
-      setTranscript("Failed to process voice. Please try again.")
+      const errorMessage = err instanceof Error ? err.message : "Failed to process voice. Please try again."
+      setError(errorMessage)
+      setTranscript(errorMessage)
     }
   }
 
@@ -271,6 +306,13 @@ export default function HomePage() {
       audioUrlRef.current = url
       const audio = new Audio(url)
       audioRef.current = audio
+      
+      audio.onerror = (e) => {
+        console.error("Audio playback error:", e)
+        setStatus("error")
+        setError("Failed to play audio. The audio file may be corrupted.")
+      }
+      
       audio.onended = () => {
         URL.revokeObjectURL(url)
         audioUrlRef.current = null
@@ -278,26 +320,31 @@ export default function HomePage() {
         setTranscript("Say something to begin...")
         lastUserTranscriptRef.current = ""
       }
+      
+      console.log("Playing audio:", { url, blobSize: audioBlob.size })
       await audio.play()
-    } catch {
+      console.log("Audio playback started successfully")
+    } catch (playError) {
+      console.error("Error playing audio:", playError)
       setStatus("error")
-      setError("Failed to play response.")
+      const errorMessage = playError instanceof Error ? playError.message : "Failed to play response."
+      setError(errorMessage)
     }
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 via-white to-emerald-50 px-4 py-10 text-slate-900">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 via-white to-emerald-50 px-4 pt-20 pb-10 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100">
       <div className="flex w-full max-w-lg flex-col items-center gap-6">
         <div className="relative w-full">
-          <div className="absolute inset-0 blur-3xl bg-emerald-200/40" aria-hidden />
-          <Card className="relative w-full border-slate-200 bg-white/90 shadow-2xl backdrop-blur">
+          <div className="absolute inset-0 blur-3xl bg-emerald-200/40 dark:bg-emerald-900/20" aria-hidden />
+          <Card className="relative w-full border-slate-200 bg-white/90 shadow-2xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/90">
             <CardContent className="flex flex-col items-center gap-8 p-8">
-              <div className="flex w-full items-center justify-between text-sm text-slate-600">
+              <div className="flex w-full items-center justify-between text-sm text-slate-600 dark:text-slate-400">
                 <span className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   Mic ready
                 </span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-300">
                   {status === "idle"
                     ? "Tap to speak"
                     : status === "listening"
@@ -316,11 +363,11 @@ export default function HomePage() {
                 <div
                   className={cn(
                     "mx-auto w-fit rounded-full px-4 py-2 text-sm font-semibold shadow-sm",
-                    status === "listening" && "bg-emerald-100 text-emerald-700",
-                    status === "sending" && "bg-amber-100 text-amber-700",
-                    status === "playing" && "bg-blue-100 text-blue-700",
-                    status === "idle" && "bg-slate-100 text-slate-700",
-                    status === "error" && "bg-red-100 text-red-700"
+                    status === "listening" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+                    status === "sending" && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+                    status === "playing" && "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+                    status === "idle" && "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
+                    status === "error" && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
                   )}
                 >
                   {status === "listening"
@@ -333,18 +380,18 @@ export default function HomePage() {
                     ? "Something went wrong"
                     : "Tap to start"}
                 </div>
-                <p className="text-lg font-semibold text-slate-900">
+                <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                   {supported ? transcript : "Voice input not supported in this browser."}
                 </p>
-                {error && <p className="text-sm text-red-600">{error}</p>}
+                {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
               </div>
 
-              <Button onClick={toggleListening} className="w-full bg-emerald-600 py-4 text-lg hover:bg-emerald-700">
+              <Button onClick={toggleListening} className="w-full bg-emerald-600 py-4 text-lg hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600">
                 {status === "listening" ? "Stop Listening" : "Start Speaking"}
               </Button>
 
-              <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-left text-slate-700">
-                <p className="font-semibold text-slate-900">Try asking:</p>
+              <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-left text-slate-700 dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300">
+                <p className="font-semibold text-slate-900 dark:text-slate-100">Try asking:</p>
                 <ul className="mt-2 space-y-1 list-disc pl-5">
                   <li>"How much did I spend this week?"</li>
                   <li>"Remind me to pay my electric bill."</li>

@@ -1,8 +1,10 @@
 import { config } from 'dotenv';
-config({ path: '.env.local' }); // load API keys
+import path from 'path';
+// Load .env.local from project root (one level up from ai directory)
+// Scripts are run from ai/ directory, so go up one level to project root
+config({ path: path.join(process.cwd(), '..', '.env.local') });
 
 import fs from 'fs';
-import path from 'path';
 import readline from 'readline';
 import { analyzeFinances } from '../lib/anthropic';
 import { generateSpeech } from '../lib/elevenlabs';

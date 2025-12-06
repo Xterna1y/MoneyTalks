@@ -1,6 +1,8 @@
 import { config } from 'dotenv';
+import path from 'path';
 // Load environment variables from the local env file before other imports use them.
-config({ path: '.env.local' });
+// Scripts are run from ai/ directory, so go up one level to project root
+config({ path: path.join(process.cwd(), '..', '.env.local') });
 
 import { analyzeFinances } from '../lib/anthropic';
 import { generateSpeech } from '../lib/elevenlabs';

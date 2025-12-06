@@ -57,8 +57,27 @@ export default defineSchema({
       v.literal("error")
     ),
     createdAt: v.number(), // Unix timestamp (ms)
-    updatedAt: v.number(), // Unix timestamp (ms)
+    updatedAt: v.optional(v.number()), // Unix timestamp (ms) - optional for backward compatibility
+    completedAt: v.optional(v.number()), // Unix timestamp (ms) - optional for backward compatibility
   })
     .index("by_user", ["userId"])
     .index("by_user_status", ["userId", "status"]),
+
+  // Spending patterns table
+  spendingPatterns: defineTable({
+    userId: v.string(), // References users._id
+    patternType: v.string(), // e.g., "weekly", "monthly", "category", "time_of_day"
+    patternData: v.any(), // Flexible structure for different pattern types
+    // Example patternData structures:
+    // Weekly: { "Monday": 150, "Tuesday": 200, ... }
+    // Monthly: { "week1": 500, "week2": 600, ... }
+    // Category: { "Food": 800, "Shopping": 500, ... }
+    // TimeOfDay: { "morning": 200, "afternoon": 400, "evening": 300 }
+    aiAnalysis: v.optional(v.string()), // AI-generated analysis and insights about the spending pattern
+    lastAnalyzedAt: v.optional(v.number()), // Unix timestamp (ms) when AI last analyzed this pattern
+    createdAt: v.number(), // Unix timestamp (ms)
+    updatedAt: v.number(), // Unix timestamp (ms)
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_type", ["userId", "patternType"]),
 });
