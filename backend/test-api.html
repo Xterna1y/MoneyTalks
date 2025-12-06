@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoneyTalks API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .test-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .response pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .status.success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+        
+        .quick-test {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-test button {
+            padding: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 MoneyTalks API Tester</h1>
+        
+        <!-- Health Check -->
+        <div class="test-section">
+            <h2>1️⃣ Health Check</h2>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+            <div id="health-response" class="response" style="display:none;"></div>
+        </div>
+        
+        <!-- Dashboard -->
+        <div class="test-section">
+            <h2>2️⃣ Dashboard API</h2>
+            <div class="input-group">
+                <label>User ID:</label>
+                <input type="text" id="dashboard-userId" value="demo-user-001" placeholder="Enter user ID">
+            </div>
+            <button onclick="testDashboard()">Get Dashboard Data</button>
+            <div id="dashboard-response" class="response" style="display:none;"></div>
+        </div>
+        
+        <!-- Budgets -->
+        <div class="test-section">
+            <h2>3️⃣ Budgets API</h2>
+            <div class="quick-test">
+                <button onclick="testGetBudgets()">GET Budgets</button>
+                <button onclick="testCreateBudget()">POST Create Budget</button>
+            </div>
+            <div class="input-group">
+                <label>User ID:</label>
+                <input type="text" id="budget-userId" value="demo-user-001">
+            </div>
+            <div class="input-group">
+                <label>Category (for POST):</label>
+                <input type="text" id="budget-category" value="Food" placeholder="e.g., Food, Shopping">
+            </div>
+            <div class="input-group">
+                <label>Limit (for POST):</label>
+                <input type="number" id="budget-limit" value="500" placeholder="e.g., 500">
+            </div>
+            <div id="budget-response" class="response" style="display:none;"></div>
+        </div>
+        
+        <!-- Accounts -->
+        <div class="test-section">
+            <h2>4️⃣ Accounts API</h2>
+            <div class="quick-test">
+                <button onclick="testGetAccounts()">GET Accounts</button>
+                <button onclick="testCreateAccount()">POST Create Account</button>
+            </div>
+            <div class="input-group">
+                <label>User ID:</label>
+                <input type="text" id="account-userId" value="demo-user-001">
+            </div>
+            <div class="input-group">
+                <label>Bank Name (for POST):</label>
+                <input type="text" id="account-bankName" value="Public Bank" placeholder="e.g., Maybank, CIMB">
+            </div>
+            <div class="input-group">
+                <label>Account Type (for POST):</label>
+                <input type="text" id="account-type" value="Savings" placeholder="e.g., Savings, Checking">
+            </div>
+            <div class="input-group">
+                <label>Masked Number (for POST):</label>
+                <input type="text" id="account-masked" value="**** 9999" placeholder="e.g., **** 1234">
+            </div>
+            <div id="account-response" class="response" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+        
+        function showResponse(elementId, data, status) {
+            const responseDiv = document.getElementById(elementId);
+            responseDiv.style.display = 'block';
+            
+            const statusClass = status >= 200 && status < 300 ? 'success' : 'error';
+            responseDiv.innerHTML = `
+                <span class="status ${statusClass}">Status: ${status}</span>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        }
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                showResponse('health-response', data, response.status);
+            } catch (error) {
+                showResponse('health-response', { error: error.message }, 500);
+            }
+        }
+        
+        async function testDashboard() {
+            const userId = document.getElementById('dashboard-userId').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard?userId=${userId}`);
+                const data = await response.json();
+                showResponse('dashboard-response', data, response.status);
+            } catch (error) {
+                showResponse('dashboard-response', { error: error.message }, 500);
+            }
+        }
+        
+        async function testGetBudgets() {
+            const userId = document.getElementById('budget-userId').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/budgets?userId=${userId}`);
+                const data = await response.json();
+                showResponse('budget-response', data, response.status);
+            } catch (error) {
+                showResponse('budget-response', { error: error.message }, 500);
+            }
+        }
+        
+        async function testCreateBudget() {
+            const userId = document.getElementById('budget-userId').value;
+            const category = document.getElementById('budget-category').value;
+            const limit = parseFloat(document.getElementById('budget-limit').value);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/budgets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, category, limit })
+                });
+                const data = await response.json();
+                showResponse('budget-response', data, response.status);
+            } catch (error) {
+                showResponse('budget-response', { error: error.message }, 500);
+            }
+        }
+        
+        async function testGetAccounts() {
+            const userId = document.getElementById('account-userId').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/accounts?userId=${userId}`);
+                const data = await response.json();
+                showResponse('account-response', data, response.status);
+            } catch (error) {
+                showResponse('account-response', { error: error.message }, 500);
+            }
+        }
+        
+        async function testCreateAccount() {
+            const userId = document.getElementById('account-userId').value;
+            const bankName = document.getElementById('account-bankName').value;
+            const accountType = document.getElementById('account-type').value;
+            const maskedNumber = document.getElementById('account-masked').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/accounts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, bankName, accountType, maskedNumber })
+                });
+                const data = await response.json();
+                showResponse('account-response', data, response.status);
+            } catch (error) {
+                showResponse('account-response', { error: error.message }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
+

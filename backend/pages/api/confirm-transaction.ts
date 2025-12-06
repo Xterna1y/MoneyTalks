@@ -1,2 +1,0 @@
-// AFTER payment → log transaction
-
