@@ -29,12 +29,10 @@ pnpm install
 Create a `.env.local` file in the root directory:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-Get your API key from: https://platform.openai.com/api-keys
-
-See `ENV_SETUP.md` for detailed instructions.
+This points the frontend to the backend voice/finance API.
 
 ### 3. Run the Development Server
 
@@ -66,28 +64,27 @@ The main page features a complete voice interface with:
 - Dark mode styling
 - Real-time status indicators (listening, processing, playing)
 
-### Backend API (`/api/voice`)
+### Backend API (`/api/voice-flow`)
 
 Complete voice processing pipeline:
 
-1. **Speech-to-Text (STT)** - Uses OpenAI Whisper to transcribe audio
-2. **AI Processing** - Uses GPT-4o-mini to generate responses
-3. **Text-to-Speech (TTS)** - Uses OpenAI TTS to convert responses to audio
+1. **Speech-to-Text (STT)** - Browser Web Speech API transcribes audio locally
+2. **AI Processing** - Claude Haiku generates responses with Convex context
+3. **Text-to-Speech (TTS)** - ElevenLabs converts responses to audio
 
 ### How It Works
 
 1. User clicks the microphone button to start recording
 2. Audio is captured from the browser's microphone
-3. Audio is sent to `/api/voice` endpoint
-4. API transcribes audio using Whisper
-5. Transcription is processed by GPT to generate a response
-6. Response is converted to speech using OpenAI TTS
-7. Audio response is played back to the user
+3. Transcribed text is sent to `/api/voice-flow` on the backend
+4. Backend uses Claude + Convex data for the reply
+5. Backend generates speech via ElevenLabs and returns base64 audio
+6. Audio response is played back to the user
 
 ### Tech Stack
 
-- **STT**: OpenAI Whisper API
-- **AI**: OpenAI GPT-4o-mini
-- **TTS**: OpenAI Text-to-Speech API
+- **STT**: Browser Web Speech API (client-side)
+- **AI**: Claude (haiku)
+- **TTS**: ElevenLabs
 - **Frontend**: React, Next.js, Tailwind CSS, Framer Motion
 - **UI Components**: Shadcn UI

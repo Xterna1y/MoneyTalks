@@ -43,4 +43,22 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_and_category", ["userId", "category"]),
+
+  // Prompts table (AI prompt lifecycle)
+  prompts: defineTable({
+    userId: v.string(), // References users._id (string id used across app)
+    prompt: v.string(),
+    contextData: v.optional(v.any()), // Optional contextual payload fetched by AI
+    response: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("error")
+    ),
+    createdAt: v.number(), // Unix timestamp (ms)
+    updatedAt: v.number(), // Unix timestamp (ms)
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_status", ["userId", "status"]),
 });

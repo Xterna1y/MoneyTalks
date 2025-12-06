@@ -241,6 +241,49 @@ Remove a bank account.
 
 ---
 
+## ✏️ Prompts (AI lifecycle)
+
+### `POST /api/prompts`
+Create a prompt.
+
+**Body:**
+```json
+{
+  "userId": "demo-user-001",
+  "prompt": "Summarize my spending",
+  "contextData": { "foo": "bar" }
+}
+```
+
+**Response:**
+```json
+{ "promptId": "p123", "status": "pending" }
+```
+
+### `GET /api/prompts?userId=...&status=pending`
+List prompts for a user (optional `status` filter).
+
+### `GET /api/prompts/:promptId`
+Get a single prompt + response/status.
+
+### `PUT /api/prompts/:promptId/response`
+AI writes back the response (status set to `completed`).
+
+**Body:**
+```json
+{ "response": "Here is your analysis..." }
+```
+
+### `PUT /api/prompts/:promptId/status`
+Update status (`pending|processing|completed|error`).
+
+**Body:**
+```json
+{ "status": "processing" }
+```
+
+---
+
 ## 🔧 Frontend Integration
 
 ### JavaScript (fetch)

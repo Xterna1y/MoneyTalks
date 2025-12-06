@@ -78,3 +78,21 @@ export async function fetchBudgetHistory(userId: string = DEFAULT_USER_ID, month
   return response.json();
 }
 
+export async function processVoicePrompt(
+  text: string,
+  userId: string = DEFAULT_USER_ID
+): Promise<{ promptId: string; textResponse: string; audioBase64: string; contentType: string }> {
+  const response = await fetch(`${API_BASE_URL}/api/voice-flow`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, text }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => response.statusText);
+    throw new Error(`Failed to process voice prompt: ${errorText}`);
+  }
+
+  return response.json();
+}
+

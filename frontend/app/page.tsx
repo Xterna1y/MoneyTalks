@@ -6,6 +6,7 @@ import { Mic } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { processVoicePrompt, DEFAULT_USER_ID } from "@/lib/api"
 
 type LayerConfig = {
   size: number
@@ -59,7 +60,7 @@ export default function Home() {
   type Status = "idle" | "listening" | "sending" | "playing" | "error"
 
   const [status, setStatus] = useState<Status>("idle")
-  const [transcript, setTranscript] = useState("Say something to begin...")
+  const [transcript, setTranscript] = useState("")
   const [supported, setSupported] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -68,8 +69,10 @@ export default function Home() {
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioUrlRef = useRef<string | null>(null)
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasSpokenRef = useRef(false)
+  const lastUserTranscriptRef = useRef("")
 
   const SILENCE_MS = 3000
 
@@ -122,6 +125,7 @@ export default function Home() {
       setTranscript(finalTranscript.trim() || "Listening...")
       if (finalTranscript.trim().length > 0) {
         hasSpokenRef.current = true
+        lastUserTranscriptRef.current = finalTranscript.trim()
         resetSilenceTimer()
       }
     }
@@ -149,6 +153,10 @@ export default function Home() {
       mediaRecorderRef.current?.stop()
       if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop())
       if (audioRef.current) audioRef.current.pause()
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current)
+        audioUrlRef.current = null
+      }
       clearSilenceTimer()
     }
   }, [])
@@ -156,6 +164,23 @@ export default function Home() {
   const toggleListening = async () => {
     if (!supported) {
       setTranscript("Voice input not supported in this browser.")
+      return
+    }
+
+    // If currently playing, stop playback and reset
+    if (status === "playing") {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.currentTime = 0
+      }
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current)
+        audioUrlRef.current = null
+      }
+      setStatus("idle")
+      setTranscript("Say something to begin...")
+      lastUserTranscriptRef.current = ""
+      clearSilenceTimer()
       return
     }
 
@@ -198,10 +223,8 @@ export default function Home() {
         }
 
         recorder.onstop = async () => {
-          const blob = new Blob(chunksRef.current, {
-            type: "audio/webm;codecs=opus",
-          })
-          await sendAudio(blob)
+          // We rely on browser SpeechRecognition transcript, not uploading audio
+          await sendTranscript()
           stream.getTracks().forEach((t) => t.stop())
         }
 
@@ -221,25 +244,26 @@ export default function Home() {
     }
   }
 
-  const sendAudio = async (audioBlob: Blob) => {
+  const sendTranscript = async () => {
     try {
       setStatus("sending")
       setTranscript("Processing with AI...")
       clearSilenceTimer()
-      const formData = new FormData()
-      formData.append("audio", audioBlob, "recording.webm")
 
-      const response = await fetch("/api/voice", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`)
+      const text =
+        lastUserTranscriptRef.current.trim() || transcript.trim()
+      if (!text) {
+        throw new Error("No transcript to send")
       }
 
-      const audioResponse = await response.blob()
-      await playAudio(audioResponse)
+      const result = await processVoicePrompt(text, DEFAULT_USER_ID)
+
+      // Convert base64 audio back to a blob for playback
+      const binary = Uint8Array.from(atob(result.audioBase64), (c) => c.charCodeAt(0))
+      const audioBlob = new Blob([binary], { type: result.contentType || "audio/mpeg" })
+
+      await playAudio(audioBlob)
+      setTranscript(result.textResponse || transcript)
     } catch (err) {
       setStatus("error")
       setError("Failed to process voice. Please try again.")
@@ -251,13 +275,19 @@ export default function Home() {
     try {
       setStatus("playing")
       clearSilenceTimer()
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current)
+      }
       const url = URL.createObjectURL(audioBlob)
+      audioUrlRef.current = url
       const audio = new Audio(url)
       audioRef.current = audio
       audio.onended = () => {
         URL.revokeObjectURL(url)
+        audioUrlRef.current = null
         setStatus("idle")
         setTranscript("Say something to begin...")
+        lastUserTranscriptRef.current = ""
       }
       await audio.play()
     } catch {
