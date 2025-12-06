@@ -68,6 +68,30 @@ export default function Home() {
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hasSpokenRef = useRef(false)
+
+  const SILENCE_MS = 3000
+
+  const clearSilenceTimer = () => {
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current)
+      silenceTimerRef.current = null
+    }
+  }
+
+  const triggerAutoStop = () => {
+    if (!hasSpokenRef.current) return
+    setStatus("sending")
+    setTranscript((prev) => prev || "Processing…")
+    recognitionRef.current?.stop()
+    mediaRecorderRef.current?.stop()
+  }
+
+  const resetSilenceTimer = () => {
+    clearSilenceTimer()
+    silenceTimerRef.current = setTimeout(triggerAutoStop, SILENCE_MS)
+  }
 
   // Speech-to-text (browser) for live transcript
   useEffect(() => {
@@ -94,13 +118,25 @@ export default function Home() {
         const chunk = event.results[i][0].transcript
         finalTranscript += chunk
       }
+      setStatus("listening")
       setTranscript(finalTranscript.trim() || "Listening...")
+      if (finalTranscript.trim().length > 0) {
+        hasSpokenRef.current = true
+        resetSilenceTimer()
+      }
+    }
+
+    recognition.onstart = () => {
+      setStatus("listening")
+      setError(null)
+      clearSilenceTimer()
     }
 
     recognition.onerror = () => {
       setStatus("error")
       setTranscript("Microphone error. Please try again.")
       setError("Microphone error. Check permissions and try again.")
+      clearSilenceTimer()
     }
 
     recognitionRef.current = recognition
@@ -113,6 +149,7 @@ export default function Home() {
       mediaRecorderRef.current?.stop()
       if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop())
       if (audioRef.current) audioRef.current.pause()
+      clearSilenceTimer()
     }
   }, [])
 
@@ -138,10 +175,12 @@ export default function Home() {
       try {
         recognitionRef.current?.start()
         setError(null)
+        resetSilenceTimer()
       } catch {
         setStatus("error")
         setTranscript("Microphone error. Please try again.")
         setError("Microphone error. Check permissions and try again.")
+        clearSilenceTimer()
       }
 
       // Start recording to send to API
@@ -171,12 +210,14 @@ export default function Home() {
         setStatus("error")
         setTranscript("Could not start recording.")
         setError("Could not start recording. Check mic permissions.")
+        clearSilenceTimer()
       }
     } else {
       setStatus("sending")
       recognitionRef.current?.stop()
       mediaRecorderRef.current?.stop()
       setTranscript((prev) => prev || "Sending for response...")
+      clearSilenceTimer()
     }
   }
 
@@ -184,6 +225,7 @@ export default function Home() {
     try {
       setStatus("sending")
       setTranscript("Processing with AI...")
+      clearSilenceTimer()
       const formData = new FormData()
       formData.append("audio", audioBlob, "recording.webm")
 
@@ -208,6 +250,7 @@ export default function Home() {
   const playAudio = async (audioBlob: Blob) => {
     try {
       setStatus("playing")
+      clearSilenceTimer()
       const url = URL.createObjectURL(audioBlob)
       const audio = new Audio(url)
       audioRef.current = audio
@@ -224,49 +267,77 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10 text-slate-900">
-      <div className="flex w-full max-w-md flex-col items-center gap-8">
-        <Card className="w-full border-slate-200 bg-white shadow-lg">
-          <CardContent className="flex flex-col items-center gap-8 p-8">
-            <AudioVisualizer active={status === "listening"} />
-
-            <div className="w-full space-y-3 text-center">
-              <div
-                className={cn(
-                  "mx-auto w-fit rounded-full px-4 py-2 text-sm font-semibold",
-                  status === "listening" && "bg-emerald-100 text-emerald-700",
-                  status === "sending" && "bg-amber-100 text-amber-700",
-                  status === "playing" && "bg-blue-100 text-blue-700",
-                  status === "idle" && "bg-slate-100 text-slate-700",
-                  status === "error" && "bg-red-100 text-red-700"
-                )}
-              >
-                {status === "listening"
-                  ? "Listening…"
-                  : status === "sending"
-                  ? "Processing…"
-                  : status === "playing"
-                  ? "Playing response…"
-                  : status === "error"
-                  ? "Something went wrong"
-                  : "Tap to start"}
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 via-white to-emerald-50 px-4 py-10 text-slate-900">
+      <div className="flex w-full max-w-lg flex-col items-center gap-6">
+        <div className="relative w-full">
+          <div className="absolute inset-0 blur-3xl bg-emerald-200/40" aria-hidden />
+          <Card className="relative w-full border-slate-200 bg-white/90 shadow-2xl backdrop-blur">
+            <CardContent className="flex flex-col items-center gap-8 p-8">
+              <div className="flex w-full items-center justify-between text-sm text-slate-600">
+                <span className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Mic ready
+                </span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                  {status === "idle"
+                    ? "Tap to speak"
+                    : status === "listening"
+                    ? "Listening"
+                    : status === "sending"
+                    ? "Processing"
+                    : status === "playing"
+                    ? "Playing"
+                    : "Error"}
+                </span>
               </div>
-              <p className="text-lg font-medium text-slate-800">
-                {supported ? transcript : "Voice input not supported in this browser."}
-              </p>
-              {error && <p className="text-sm text-red-600">{error}</p>}
-            </div>
 
-            <Button
-              onClick={toggleListening}
-              className="w-full bg-emerald-600 py-4 text-lg hover:bg-emerald-700"
-            >
-              {status === "listening" ? "Stop Listening" : "Start Speaking"}
-            </Button>
+              <AudioVisualizer active={status === "listening"} />
 
-            <p className="text-sm text-slate-500">Tip: Speak clearly and pause after your request.</p>
-          </CardContent>
-        </Card>
+              <div className="w-full space-y-3 text-center">
+                <div
+                  className={cn(
+                    "mx-auto w-fit rounded-full px-4 py-2 text-sm font-semibold shadow-sm",
+                    status === "listening" && "bg-emerald-100 text-emerald-700",
+                    status === "sending" && "bg-amber-100 text-amber-700",
+                    status === "playing" && "bg-blue-100 text-blue-700",
+                    status === "idle" && "bg-slate-100 text-slate-700",
+                    status === "error" && "bg-red-100 text-red-700"
+                  )}
+                >
+                  {status === "listening"
+                    ? "Listening…"
+                    : status === "sending"
+                    ? "Processing…"
+                    : status === "playing"
+                    ? "Playing response…"
+                    : status === "error"
+                    ? "Something went wrong"
+                    : "Tap to start"}
+                </div>
+                <p className="text-lg font-semibold text-slate-900">
+                  {supported ? transcript : "Voice input not supported in this browser."}
+                </p>
+                {error && <p className="text-sm text-red-600">{error}</p>}
+              </div>
+
+              <Button
+                onClick={toggleListening}
+                className="w-full bg-emerald-600 py-4 text-lg hover:bg-emerald-700"
+              >
+                {status === "listening" ? "Stop Listening" : "Start Speaking"}
+              </Button>
+
+              <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-left text-slate-700">
+                <p className="font-semibold text-slate-900">Try asking:</p>
+                <ul className="mt-2 space-y-1 list-disc pl-5">
+                  <li>"How much did I spend this week?"</li>
+                  <li>"Remind me to pay my electric bill."</li>
+                  <li>"What's my groceries budget left?"</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </main>
   )

@@ -27,6 +27,7 @@ const weeklySpend = [
 const accounts = [
   { name: "Maybank Savings", masked: "••9832", balance: "RM 2,150.00", linked: true },
   { name: "CIMB Debit", masked: "••4471", balance: "RM 820.50", linked: true },
+  { name: "RYT Bank", masked: "••5620", balance: "RM 1,420.75", linked: true },
   { name: "Add a bank", masked: "", balance: "Tap to connect", linked: false },
 ]
 
