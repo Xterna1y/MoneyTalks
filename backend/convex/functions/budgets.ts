@@ -17,20 +17,41 @@ export const getBudgets = query({
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
 
+    // Calculate start of current month
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+    // Get all transactions for this month
+    const transactionsThisMonth = await ctx.db
+      .query("transactions")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .filter((q) => q.gte("createdAt", startOfMonth))
+      .collect();
+
+    // Calculate spent per category for current month
+    const categorySpentMap = new Map<string, number>();
+    for (const t of transactionsThisMonth) {
+      categorySpentMap.set(t.category, (categorySpentMap.get(t.category) || 0) + t.amount);
+    }
+
     // Sort alphabetically by category
     const sortedBudgets = budgets.sort((a, b) =>
       a.category.localeCompare(b.category)
     );
 
-    // Map to Budget type shape
-    return sortedBudgets.map((b) => ({
-      id: b._id,
-      userId: b.userId,
-      category: b.category,
-      limit: b.limit,
-      spent: b.spent,
-      remaining: b.remaining,
-    }));
+    // Map to Budget type shape with dynamically calculated spent
+    return sortedBudgets.map((b) => {
+      const spent = categorySpentMap.get(b.category) || 0;
+      const remaining = b.limit - spent;
+      return {
+        id: b._id,
+        userId: b.userId,
+        category: b.category,
+        limit: b.limit,
+        spent,
+        remaining,
+      };
+    });
   },
 });
 

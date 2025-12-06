@@ -10,7 +10,6 @@
 
 import type * as functions_accounts from "../functions/accounts.js";
 import type * as functions_budgets from "../functions/budgets.js";
-import type * as functions_prompts from "../functions/prompts.js";
 import type * as functions_transactions from "../functions/transactions.js";
 
 import type {
@@ -22,7 +21,6 @@ import type {
 declare const fullApi: ApiFromModules<{
   "functions/accounts": typeof functions_accounts;
   "functions/budgets": typeof functions_budgets;
-  "functions/prompts": typeof functions_prompts;
   "functions/transactions": typeof functions_transactions;
 }>;
 
