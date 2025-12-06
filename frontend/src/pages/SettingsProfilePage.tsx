@@ -23,10 +23,9 @@ export default function SettingsProfilePage() {
       <div className="mx-auto max-w-md space-y-6 pt-8">
         <div className="flex items-center gap-2">
           <User className="h-6 w-6 text-emerald-600" />
-          <h1 className="text-2xl font-semibold">Profile & Safety</h1>
+          <h1 className="text-2xl font-semibold">Profile &amp; Safety</h1>
         </div>
 
-        {/* Contact info */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800">Contact</CardTitle>
@@ -73,7 +72,6 @@ export default function SettingsProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Caregiver link */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg text-slate-800">Caretaker</CardTitle>
@@ -96,16 +94,15 @@ export default function SettingsProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Safety toggles */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg text-slate-800">Safety & Alerts</CardTitle>
+            <CardTitle className="text-lg text-slate-800">Safety &amp; Alerts</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-slate-900">Notifications</p>
-                <p className="text-sm text-slate-600">Transaction & bill alerts</p>
+                <p className="text-sm text-slate-600">Transaction &amp; bill alerts</p>
               </div>
               <Switch checked={notifications} onCheckedChange={setNotifications} />
             </div>
@@ -122,3 +119,4 @@ export default function SettingsProfilePage() {
     </main>
   )
 }
+

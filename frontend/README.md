@@ -1,90 +1,59 @@
 # Voice Interface App
 
-A Next.js 14 application with Tailwind CSS, Shadcn UI, and a voice interface featuring a pulsing microphone button.
+React + Vite single-page app with Tailwind CSS, shadcn/ui components, and a voice-first experience powered by the Web Speech API.
 
 ## Features
 
-- Next.js 14 with App Router
-- TypeScript
-- Tailwind CSS
-- Shadcn UI setup (utilities configured)
-- Dark mode by default
-- Mobile-responsive design
-- Pulsing microphone button using Lucide-react icons
+- Vite + React Router for fast SPA routing
+- TypeScript, Tailwind CSS, shadcn/ui utilities
+- Framer Motion animations and Lucide icons
+- Mobile-first bottom navigation and voice mic interaction
 
 ## Getting Started
 
-### 1. Install Dependencies
+### 1) Install dependencies
 
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-### 2. Set Up Environment Variables
+### 2) Environment variables
 
-Create a `.env.local` file in the root directory:
+Create `.env` (or `.env.local`) in `frontend/`:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:3001
 ```
 
-This points the frontend to the backend voice/finance API.
+This points the UI to the backend finance/voice API. See `env.example` for a ready-to-copy default.
 
-### 3. Run the Development Server
+### 3) Run the app
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+npm run dev    # http://localhost:5173
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 4) Build & preview
+
+```bash
+npm run build
+npm run preview
+```
 
 ## Project Structure
 
-- `app/` - Next.js App Router pages and layouts
-- `lib/` - Utility functions (including Shadcn UI utils)
-- `components/` - Reusable React components (ready for Shadcn UI components)
+- `src/main.tsx` - Vite entry; mounts React Router
+- `src/App.tsx` - routes + shared chrome (bottom nav)
+- `src/pages` - page-level screens (Home, Dashboard, Budget, etc.)
+- `src/components` - shared UI (shadcn/ui primitives, bottom nav)
+- `src/lib/api.ts` - API client using `VITE_API_URL`
+- `src/index.css` - Tailwind base + design tokens
+- `tailwind.config.ts` - Tailwind configuration for Vite
+- `app/`, `components/`, `lib/` - legacy Next.js sources retained for reference only (not used by Vite build)
 
-## Voice Interface
+## Voice Interface Flow (`/api/voice-flow`)
 
-The main page features a complete voice interface with:
-
-### Frontend Features
-- Large, centered, pulsing microphone button
-- Smooth animations using Framer Motion
-- Responsive sizing for mobile, tablet, and desktop
-- Visual feedback with pulse and ping effects
-- Dark mode styling
-- Real-time status indicators (listening, processing, playing)
-
-### Backend API (`/api/voice-flow`)
-
-Complete voice processing pipeline:
-
-1. **Speech-to-Text (STT)** - Browser Web Speech API transcribes audio locally
-2. **AI Processing** - Claude Haiku generates responses with Convex context
-3. **Text-to-Speech (TTS)** - ElevenLabs converts responses to audio
-
-### How It Works
-
-1. User clicks the microphone button to start recording
-2. Audio is captured from the browser's microphone
-3. Transcribed text is sent to `/api/voice-flow` on the backend
-4. Backend uses Claude + Convex data for the reply
-5. Backend generates speech via ElevenLabs and returns base64 audio
-6. Audio response is played back to the user
-
-### Tech Stack
-
-- **STT**: Browser Web Speech API (client-side)
-- **AI**: Claude (haiku)
-- **TTS**: ElevenLabs
-- **Frontend**: React, Next.js, Tailwind CSS, Framer Motion
-- **UI Components**: Shadcn UI
+1. Browser Web Speech API transcribes locally.
+2. Transcript is sent to the backend (`VITE_API_URL`).
+3. Backend (Claude + ElevenLabs) returns text + base64 audio.
+4. The app plays the response audio and shows the generated text.

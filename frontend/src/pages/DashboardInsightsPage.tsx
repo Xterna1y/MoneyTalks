@@ -3,19 +3,7 @@
 import { TrendingUp, AlertCircle, ShieldCheck, Activity } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from "recharts"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts"
 
 const categories = [
   { name: "Groceries", value: 520, limit: 800 },
@@ -49,7 +37,6 @@ export default function DashboardInsightsPage() {
           <h1 className="text-2xl font-semibold">Spending Insights</h1>
         </div>
 
-        {/* Trend card with chart */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg text-slate-800">Monthly Trend</CardTitle>
@@ -76,7 +63,6 @@ export default function DashboardInsightsPage() {
           </CardContent>
         </Card>
 
-        {/* Category breakdown with donut */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800">By Category</CardTitle>
@@ -85,16 +71,7 @@ export default function DashboardInsightsPage() {
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie
-                    data={categories}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={90}
-                    paddingAngle={2}
-                  >
+                  <Pie data={categories} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={2}>
                     {categories.map((_, idx) => (
                       <Cell key={`cell-${idx}`} fill={pieColors[idx % pieColors.length]} />
                     ))}
@@ -125,7 +102,6 @@ export default function DashboardInsightsPage() {
           </CardContent>
         </Card>
 
-        {/* Alerts */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800">Alerts</CardTitle>
@@ -153,3 +129,4 @@ export default function DashboardInsightsPage() {
     </main>
   )
 }
+

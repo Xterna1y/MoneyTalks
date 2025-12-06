@@ -1,9 +1,5 @@
-"use client"
-
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { Mic, LayoutDashboard, PieChart, Settings } from "lucide-react"
-
+import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -14,11 +10,11 @@ const navItems = [
 ]
 
 export function BottomNav() {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/"
-    return pathname.startsWith(href)
+    return pathname === href || pathname.startsWith(`${href}/`)
   }
 
   return (
@@ -34,7 +30,7 @@ export function BottomNav() {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               aria-label={item.label}
               className={cn(
                 "flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 text-base font-semibold transition",
@@ -44,10 +40,7 @@ export function BottomNav() {
               )}
             >
               <Icon
-                className={cn(
-                  "h-6 w-6",
-                  active ? "text-emerald-700" : "text-slate-500"
-                )}
+                className={cn("h-6 w-6", active ? "text-emerald-700" : "text-slate-500")}
               />
               <span>{item.label}</span>
             </Link>
@@ -57,3 +50,4 @@ export function BottomNav() {
     </div>
   )
 }
+

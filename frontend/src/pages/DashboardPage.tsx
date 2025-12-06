@@ -2,18 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { AlertTriangle, Banknote, Link2, PhoneCall, PlusCircle, TrendingUp } from "lucide-react"
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
 import { fetchDashboard, fetchAccounts, fetchBudgets, DEFAULT_USER_ID } from "@/lib/api"
 
 export default function DashboardPage() {
@@ -46,7 +38,6 @@ export default function DashboardPage() {
     loadData()
   }, [])
 
-  // Calculate weekly spending from recent transactions
   const calculateWeeklySpending = () => {
     if (!dashboardData?.recentTransactions) {
       return [
@@ -62,7 +53,7 @@ export default function DashboardPage() {
 
     const now = new Date()
     const startOfWeek = new Date(now)
-    startOfWeek.setDate(now.getDate() - now.getDay()) // Start of week (Sunday)
+    startOfWeek.setDate(now.getDate() - now.getDay())
     startOfWeek.setHours(0, 0, 0, 0)
 
     const dayTotals = new Map<string, number>()
@@ -82,7 +73,6 @@ export default function DashboardPage() {
     }))
   }
 
-  // Check for budget alerts
   const getBudgetAlerts = () => {
     if (!dashboardData?.byCategory || !budgets.length) return []
 
@@ -144,7 +134,6 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-slate-50 p-4 text-slate-900">
       <div className="mx-auto flex max-w-md flex-col gap-6 pt-8">
-        {/* Totals */}
         <div className="grid grid-cols-2 gap-3">
           <Card className="border-slate-200 bg-white shadow-md">
             <CardHeader className="pb-2">
@@ -166,7 +155,6 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Weekly spend chart */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg text-slate-800">Weekly Spending</CardTitle>
@@ -189,19 +177,12 @@ export default function DashboardPage() {
                   contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}
                   labelStyle={{ color: "#0f172a" }}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="spent"
-                  stroke="#16a34a"
-                  fill="url(#spend)"
-                  strokeWidth={2.5}
-                />
+                <Area type="monotone" dataKey="spent" stroke="#16a34a" fill="url(#spend)" strokeWidth={2.5} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Recent Alerts */}
         {budgetAlerts.length > 0 && (
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-slate-600">Recent Alerts</h2>
@@ -221,7 +202,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Accounts */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg text-slate-800">Accounts</CardTitle>
@@ -254,7 +234,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-slate-600">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3">
@@ -266,7 +245,7 @@ export default function DashboardPage() {
               <PhoneCall className="h-6 w-6" />
               <span className="text-base">Call Emergency</span>
             </Button>
-            <Link href="/dashboard/insights" className="col-span-2">
+            <Link to="/dashboard/insights" className="col-span-2">
               <Button
                 variant="outline"
                 className="w-full justify-center gap-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
@@ -281,3 +260,4 @@ export default function DashboardPage() {
     </main>
   )
 }
+

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { Link } from "react-router-dom"
 
 export default function SettingsPage() {
   const [voiceOnly, setVoiceOnly] = useState(false)
@@ -92,9 +92,7 @@ export default function SettingsPage() {
                   Detailed
                 </button>
               </div>
-              <p className="text-xs text-slate-600">
-                Choose shorter replies or detailed explanations.
-              </p>
+              <p className="text-xs text-slate-600">Choose shorter replies or detailed explanations.</p>
             </div>
             <div className="space-y-1">
               <label className="text-sm text-slate-700">Voice</label>
@@ -122,9 +120,7 @@ export default function SettingsPage() {
                   Male
                 </button>
               </div>
-              <p className="text-xs text-slate-600">
-                Set preferred voice gender for responses.
-              </p>
+              <p className="text-xs text-slate-600">Set preferred voice gender for responses.</p>
             </div>
           </CardContent>
         </Card>
@@ -180,15 +176,16 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Link href="/settings/profile">
+        <Link to="/settings/profile">
           <Button
             variant="outline"
             className="w-full border-emerald-600 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
           >
-            Profile & Safety
+            Profile &amp; Safety
           </Button>
         </Link>
       </div>
     </main>
   )
 }
+

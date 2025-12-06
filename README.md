@@ -15,10 +15,9 @@ MoneyTalks/
 │   ├── types/          # TypeScript interfaces
 │   └── scripts/        # Utility scripts
 │
-├── 📁 frontend/        # Next.js 14 frontend
-│   ├── app/            # Next.js app router pages
-│   ├── components/     # React components
-│   └── lib/            # Frontend utilities
+├── 📁 frontend/        # React + Vite SPA (legacy Next.js sources kept for reference)
+│   ├── src/            # Vite entry, routes, pages, components
+│   └── app/components/lib/ # Legacy Next.js code (not used by Vite build)
 │
 └── 📁 ai/              # Separate AI testing project
 ```
@@ -36,13 +35,13 @@ cp .env.example .env.local  # Add your CONVEX_URL
 npm start                   # Runs on http://localhost:3001
 ```
 
-### Frontend Setup
+### Frontend Setup (React + Vite)
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local  # Add NEXT_PUBLIC_API_URL
-npm run dev                 # Runs on http://localhost:3000
+cp .env.example .env        # Set VITE_API_URL
+npm run dev                 # Runs on http://localhost:5173
 ```
 
 ---
@@ -70,7 +69,7 @@ npm run dev                 # Runs on http://localhost:3000
 ## 🛠️ Tech Stack
 
 - **Backend**: Express.js, Convex (serverless database)
-- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Frontend**: React + Vite, TypeScript, Tailwind CSS
 - **Database**: Convex (real-time database)
 - **AI**: Claude (Anthropic), ElevenLabs (TTS)
 

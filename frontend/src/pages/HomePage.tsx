@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useMemo, useRef, useState } from "react"
 import { motion } from "framer-motion"
 import { Mic } from "lucide-react"
@@ -56,7 +54,7 @@ function AudioVisualizer({ active }: { active: boolean }) {
   )
 }
 
-export default function Home() {
+export default function HomePage() {
   type Status = "idle" | "listening" | "sending" | "playing" | "error"
 
   const [status, setStatus] = useState<Status>("idle")
@@ -96,13 +94,11 @@ export default function Home() {
     silenceTimerRef.current = setTimeout(triggerAutoStop, SILENCE_MS)
   }
 
-  // Speech-to-text (browser) for live transcript
   useEffect(() => {
     const SpeechRecognition =
       (typeof window !== "undefined" &&
         (window.SpeechRecognition ||
-          (window as unknown as { webkitSpeechRecognition?: SpeechRecognition })
-            .webkitSpeechRecognition)) ||
+          (window as unknown as { webkitSpeechRecognition?: SpeechRecognition }).webkitSpeechRecognition)) ||
       null
 
     if (!SpeechRecognition) {
@@ -146,7 +142,6 @@ export default function Home() {
     recognitionRef.current = recognition
   }, [])
 
-  // Cleanup
   useEffect(() => {
     return () => {
       recognitionRef.current?.stop()
@@ -167,7 +162,6 @@ export default function Home() {
       return
     }
 
-    // If currently playing, stop playback and reset
     if (status === "playing") {
       if (audioRef.current) {
         audioRef.current.pause()
@@ -185,7 +179,6 @@ export default function Home() {
     }
 
     if (status !== "listening") {
-      // Ask for mic permission first
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true })
       } catch (err) {
@@ -208,7 +201,6 @@ export default function Home() {
         clearSilenceTimer()
       }
 
-      // Start recording to send to API
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         streamRef.current = stream
@@ -223,7 +215,6 @@ export default function Home() {
         }
 
         recorder.onstop = async () => {
-          // We rely on browser SpeechRecognition transcript, not uploading audio
           await sendTranscript()
           stream.getTracks().forEach((t) => t.stop())
         }
@@ -250,15 +241,13 @@ export default function Home() {
       setTranscript("Processing with AI...")
       clearSilenceTimer()
 
-      const text =
-        lastUserTranscriptRef.current.trim() || transcript.trim()
+      const text = lastUserTranscriptRef.current.trim() || transcript.trim()
       if (!text) {
         throw new Error("No transcript to send")
       }
 
       const result = await processVoicePrompt(text, DEFAULT_USER_ID)
 
-      // Convert base64 audio back to a blob for playback
       const binary = Uint8Array.from(atob(result.audioBase64), (c) => c.charCodeAt(0))
       const audioBlob = new Blob([binary], { type: result.contentType || "audio/mpeg" })
 
@@ -350,10 +339,7 @@ export default function Home() {
                 {error && <p className="text-sm text-red-600">{error}</p>}
               </div>
 
-              <Button
-                onClick={toggleListening}
-                className="w-full bg-emerald-600 py-4 text-lg hover:bg-emerald-700"
-              >
+              <Button onClick={toggleListening} className="w-full bg-emerald-600 py-4 text-lg hover:bg-emerald-700">
                 {status === "listening" ? "Stop Listening" : "Start Speaking"}
               </Button>
 
@@ -372,3 +358,4 @@ export default function Home() {
     </main>
   )
 }
+

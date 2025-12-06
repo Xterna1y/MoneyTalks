@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { fetchDashboard, fetchBudgetHistory, DEFAULT_USER_ID } from "@/lib/api"
 
-// Helper function to format date
 function formatTransactionDate(timestamp: number): string {
   const date = new Date(timestamp)
   const now = new Date()
@@ -16,12 +15,12 @@ function formatTransactionDate(timestamp: number): string {
   const transactionDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
   if (transactionDate.getTime() === today.getTime()) {
-    return `Today, ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
+    return `Today, ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`
   } else if (transactionDate.getTime() === yesterday.getTime()) {
-    return `Yesterday, ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
+    return `Yesterday, ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`
   } else {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    return `${days[date.getDay()]}, ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    return `${days[date.getDay()]}, ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`
   }
 }
 
@@ -37,7 +36,7 @@ export default function BudgetHistoryPage() {
         setLoading(true)
         const [dashboard, history] = await Promise.all([
           fetchDashboard(DEFAULT_USER_ID),
-          fetchBudgetHistory(DEFAULT_USER_ID, 6), // Get last 6 months
+          fetchBudgetHistory(DEFAULT_USER_ID, 6),
         ])
         setDashboardData(dashboard)
         setMonthlyHistory(history)
@@ -84,7 +83,6 @@ export default function BudgetHistoryPage() {
           <h1 className="text-2xl font-semibold">Budget History</h1>
         </div>
 
-        {/* Monthly summary */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg text-slate-800">Monthly Recap</CardTitle>
@@ -114,7 +112,6 @@ export default function BudgetHistoryPage() {
           </CardContent>
         </Card>
 
-        {/* Recent deductions */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg text-slate-800">Recent Deductions</CardTitle>
@@ -129,19 +126,13 @@ export default function BudgetHistoryPage() {
                 >
                   <div className="space-y-1">
                     <p className="font-medium text-slate-900">{transaction.merchant}</p>
-                    <p className="text-xs text-slate-600">
-                      {formatTransactionDate(transaction.createdAt)}
-                    </p>
+                    <p className="text-xs text-slate-600">{formatTransactionDate(transaction.createdAt)}</p>
                   </div>
-                  <p className="text-sm font-semibold text-red-500">
-                    - RM {transaction.amount.toFixed(2)}
-                  </p>
+                  <p className="text-sm font-semibold text-red-500">- RM {transaction.amount.toFixed(2)}</p>
                 </div>
               ))
             ) : (
-              <div className="text-center text-slate-600 py-4">
-                No recent transactions
-              </div>
+              <div className="text-center text-slate-600 py-4">No recent transactions</div>
             )}
           </CardContent>
         </Card>
@@ -149,3 +140,4 @@ export default function BudgetHistoryPage() {
     </main>
   )
 }
+

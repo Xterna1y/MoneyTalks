@@ -1,20 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import Link from "next/link"
 import { fetchBudgets, createOrUpdateBudget, DEFAULT_USER_ID } from "@/lib/api"
 
 export default function BudgetPage() {
@@ -52,7 +43,6 @@ export default function BudgetPage() {
     try {
       setSaving(true)
       await createOrUpdateBudget(DEFAULT_USER_ID, selectedCategory, parseFloat(limit))
-      // Reload budgets
       const data = await fetchBudgets(DEFAULT_USER_ID)
       setBudgets(data)
       setLimit("")
@@ -66,19 +56,18 @@ export default function BudgetPage() {
     }
   }
 
-  // Calculate totals
   const totalLimit = budgets.reduce((sum, b) => sum + b.limit, 0)
   const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0)
   const percentUsed = totalLimit > 0 ? Math.min((totalSpent / totalLimit) * 100, 100) : 0
 
-  // Chart data
-  const chartData = budgets.length > 0
-    ? budgets.map((b) => ({
-        name: b.category.length > 10 ? b.category.substring(0, 10) + "..." : b.category,
-        Limit: b.limit,
-        Spent: b.spent,
-      }))
-    : []
+  const chartData =
+    budgets.length > 0
+      ? budgets.map((b) => ({
+          name: b.category.length > 10 ? b.category.substring(0, 10) + "..." : b.category,
+          Limit: b.limit,
+          Spent: b.spent,
+        }))
+      : []
 
   if (loading) {
     return (
@@ -109,7 +98,6 @@ export default function BudgetPage() {
       <div className="mx-auto max-w-md space-y-6 pt-8">
         <h1 className="text-3xl font-bold text-slate-900">Monthly Budget</h1>
 
-        {/* Chart */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800">Limit vs Spent</CardTitle>
@@ -138,7 +126,6 @@ export default function BudgetPage() {
           </CardContent>
         </Card>
 
-        {/* Update Limit */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800">Update Budget</CardTitle>
@@ -172,18 +159,13 @@ export default function BudgetPage() {
                   placeholder="Enter budget limit"
                 />
               </div>
-              <Button
-                type="submit"
-                disabled={saving}
-                className="w-full bg-emerald-600 py-3 text-lg hover:bg-emerald-700"
-              >
+              <Button type="submit" disabled={saving} className="w-full bg-emerald-600 py-3 text-lg hover:bg-emerald-700">
                 {saving ? "Saving..." : "Save Budget"}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        {/* Budget List */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800">Your Budgets</CardTitle>
@@ -191,9 +173,7 @@ export default function BudgetPage() {
           <CardContent className="space-y-3">
             {budgets.length > 0 ? (
               budgets.map((budget) => {
-                const budgetPercent = budget.limit > 0
-                  ? Math.min((budget.spent / budget.limit) * 100, 100)
-                  : 0
+                const budgetPercent = budget.limit > 0 ? Math.min((budget.spent / budget.limit) * 100, 100) : 0
                 return (
                   <div key={budget.id} className="space-y-2 rounded-lg border border-slate-200 bg-white p-3">
                     <div className="flex items-center justify-between">
@@ -218,7 +198,6 @@ export default function BudgetPage() {
           </CardContent>
         </Card>
 
-        {/* Progress */}
         <Card className="border-slate-200 bg-white shadow-md">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800">Total Budget Usage</CardTitle>
@@ -232,7 +211,7 @@ export default function BudgetPage() {
           </CardContent>
         </Card>
 
-        <Link href="/budget/history">
+        <Link to="/budget/history">
           <Button
             variant="outline"
             className="w-full border-emerald-600 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
@@ -244,3 +223,4 @@ export default function BudgetPage() {
     </main>
   )
 }
+
